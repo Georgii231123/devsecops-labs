@@ -1,0 +1,47 @@
+name: Kubernetes Operator Platform
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'kubernetes-operator-platform/**'
+      - '.github/workflows/kubernetes-operator-platform.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'kubernetes-operator-platform/**'
+      - '.github/workflows/kubernetes-operator-platform.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  operator-test:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: kubernetes-operator-platform
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.26.x'
+      - name: Resolve and verify dependencies
+        run: go mod tidy && go mod verify
+      - name: Formatting
+        run: test -z "$(gofmt -l .)"
+      - name: Vet
+        run: go vet ./...
+      - name: Unit tests
+        run: go test ./... -count=1
+      - name: Install envtest assets
+        run: |
+          curl -fsSLo setup-envtest https://github.com/kubernetes-sigs/controller-runtime/releases/download/v0.24.1/setup-envtest-linux-amd64
+          echo 'a9a78fadfc338a38188332f36863c76877f1c86df1a83d2241d2bfc3935297d2  setup-envtest' | sha256sum -c -
+          chmod +x setup-envtest
+          echo "KUBEBUILDER_ASSETS=$(./setup-envtest use -p path 1.36.x)" >> "$GITHUB_ENV"
+      - name: Envtest integration
+        run: go test ./internal/controller -run TestEnvtestReconciliation -count=1 -v
+      - name: Build operator
+        run: CGO_ENABLED=0 go build -trimpath ./cmd

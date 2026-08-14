@@ -1,0 +1,8 @@
+apiVersion: platform.example.io/v1alpha1
+kind: WebService
+metadata:
+  name: payments
+spec:
+  image: ghcr.io/example/payments:1.4.2
+  replicas: 3
+  port: 8080
