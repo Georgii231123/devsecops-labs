@@ -1,0 +1,102 @@
+stages:
+  - validate
+  - test
+  - autofix
+  - security
+  - supply_chain
+
+default:
+  interruptible: true
+
+.python_job:
+  image: python:3.13-slim
+  before_script:
+    - python -m pip install --upgrade pip
+    - pip install -r requirements-dev.txt
+  cache:
+    key: "pip-${CI_COMMIT_REF_SLUG}"
+    paths:
+      - .cache/pip
+  variables:
+    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+lint:
+  extends: .python_job
+  stage: validate
+  script:
+    - ruff check .
+    - ruff format --check .
+
+unit_tests:
+  extends: .python_job
+  stage: test
+  script:
+    - pytest -q --junitxml=pytest-report.xml
+  artifacts:
+    when: always
+    reports:
+      junit: pytest-report.xml
+
+# Deterministic remediation only: Ruff's safe fixes + formatter.
+# The job creates a patch artifact and never pushes directly to a protected branch.
+autofix_preview:
+  extends: .python_job
+  stage: autofix
+  script:
+    - ruff check --fix-only .
+    - ruff format .
+    - git diff -- . ':!autofix.patch' > autofix.patch
+    - test ! -s autofix.patch || cat autofix.patch
+  artifacts:
+    when: always
+    expire_in: 7 days
+    paths:
+      - autofix.patch
+
+sast_bandit:
+  extends: .python_job
+  stage: security
+  script:
+    - bandit -r app -q -ll
+
+sca_pip_audit:
+  extends: .python_job
+  stage: security
+  script:
+    - pip-audit -r requirements.txt
+
+gitleaks:
+  stage: security
+  image:
+    name: zricethezav/gitleaks:v8.30.1
+    entrypoint: [""]
+  script:
+    - gitleaks detect --source . --no-banner --redact --exit-code 1
+
+trivy_repository:
+  stage: security
+  image:
+    name: aquasec/trivy:0.72.0
+    entrypoint: [""]
+  script:
+    - trivy fs --scanners vuln,secret,misconfig --severity HIGH,CRITICAL --exit-code 1 --ignore-unfixed .
+
+hadolint:
+  stage: security
+  image:
+    name: hadolint/hadolint:v2.12.0-alpine
+    entrypoint: [""]
+  script:
+    - hadolint Dockerfile
+
+sbom:
+  stage: supply_chain
+  image:
+    name: anchore/syft:v1.44.0
+    entrypoint: [""]
+  script:
+    - syft dir:. -o cyclonedx-json=sbom.cdx.json
+  artifacts:
+    expire_in: 30 days
+    paths:
+      - sbom.cdx.json
