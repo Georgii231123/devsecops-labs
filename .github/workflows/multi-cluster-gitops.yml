@@ -57,8 +57,8 @@ jobs:
         run: |
           kind create cluster --name management --wait 60s
           kubectl --context kind-management create namespace argocd
-          kubectl --context kind-management apply -f https://raw.githubusercontent.com/argoproj/argo-cd/v3.4.2/manifests/crds/appproject-crd.yaml
-          kubectl --context kind-management apply -f https://raw.githubusercontent.com/argoproj/argo-cd/v3.4.2/manifests/crds/applicationset-crd.yaml
+          kubectl --context kind-management apply --server-side -f https://raw.githubusercontent.com/argoproj/argo-cd/v3.4.2/manifests/crds/appproject-crd.yaml
+          kubectl --context kind-management apply --server-side -f https://raw.githubusercontent.com/argoproj/argo-cd/v3.4.2/manifests/crds/applicationset-crd.yaml
           kubectl --context kind-management wait --for=condition=Established crd/appprojects.argoproj.io --timeout=60s
           kubectl --context kind-management wait --for=condition=Established crd/applicationsets.argoproj.io --timeout=60s
           kubectl --context kind-management apply --server-side -f argocd/appproject.yaml
