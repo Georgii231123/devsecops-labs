@@ -1,0 +1,34 @@
+name: Terraform Cloud Platform
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'cloud-platform-terraform/**'
+      - '.github/workflows/cloud-platform.yml'
+  pull_request:
+    paths:
+      - 'cloud-platform-terraform/**'
+      - '.github/workflows/cloud-platform.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: cloud-platform-terraform
+    steps:
+      - uses: actions/checkout@v6
+      - name: Terraform fmt
+        run: docker run --rm -v "$PWD:/workspace" -w /workspace hashicorp/terraform:1.12.2 fmt -check -recursive
+      - name: Terraform init and validate
+        run: |
+          docker run --rm -v "$PWD:/workspace" -w /workspace hashicorp/terraform:1.12.2 init -backend=false
+          docker run --rm -v "$PWD:/workspace" -w /workspace hashicorp/terraform:1.12.2 validate
+      - name: Checkov
+        run: docker run --rm -v "$PWD:/src" bridgecrew/checkov:latest -d /src --framework terraform --compact --soft-fail
+      - name: Trivy IaC
+        run: docker run --rm -v "$PWD:/src" aquasec/trivy:latest config --exit-code 0 /src

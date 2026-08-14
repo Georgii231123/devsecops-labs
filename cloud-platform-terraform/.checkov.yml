@@ -1,0 +1,6 @@
+compact: true
+quiet: true
+framework:
+  - terraform
+skip-check:
+  - CKV_AWS_338 # Lab keeps log retention configurable rather than forcing one organizational value.
