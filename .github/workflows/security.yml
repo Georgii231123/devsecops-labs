@@ -6,20 +6,28 @@ on:
     paths:
       - 'k8s/**'
       - 'policy/**'
+      - 'Makefile'
       - '.github/workflows/security.yml'
   pull_request:
     paths:
       - 'k8s/**'
       - 'policy/**'
+      - 'Makefile'
       - '.github/workflows/security.yml'
 
 permissions:
   contents: read
 
+env:
+  CONFTEST_IMAGE: openpolicyagent/conftest:v0.69.0
+  TRIVY_IMAGE: aquasec/trivy:0.74.0
+  CHECKOV_IMAGE: bridgecrew/checkov:3.3.9
+
 jobs:
   policy-as-code:
     name: OPA / Conftest policy gate
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -29,7 +37,7 @@ jobs:
           docker run --rm \
             -v "${PWD}:/project" \
             -w /project \
-            openpolicyagent/conftest:latest \
+            "$CONFTEST_IMAGE" \
             test k8s/hardened --policy policy
 
       - name: Prove vulnerable manifests are rejected
@@ -37,7 +45,7 @@ jobs:
           if docker run --rm \
             -v "${PWD}:/project" \
             -w /project \
-            openpolicyagent/conftest:latest \
+            "$CONFTEST_IMAGE" \
             test k8s/vulnerable --policy policy; then
             echo "::error::The intentionally vulnerable manifest unexpectedly passed policy checks"
             exit 1
@@ -48,6 +56,7 @@ jobs:
   scanner-observability:
     name: Additional IaC scanners
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: policy-as-code
     steps:
       - name: Checkout
@@ -57,14 +66,14 @@ jobs:
         run: |
           docker run --rm \
             -v "${PWD}:/project" \
-            aquasec/trivy:latest \
+            "$TRIVY_IMAGE" \
             config --severity HIGH,CRITICAL --exit-code 0 /project/k8s/hardened
 
       - name: Checkov Kubernetes scan
         run: |
           docker run --rm \
             -v "${PWD}:/project" \
-            bridgecrew/checkov:latest \
+            "$CHECKOV_IMAGE" \
             -d /project/k8s/hardened \
             --framework kubernetes \
             --compact \

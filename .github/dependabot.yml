@@ -4,3 +4,46 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: gomod
+    directory: /kubernetes-operator-platform
+    schedule:
+      interval: weekly
+    groups:
+      go-runtime:
+        patterns:
+          - "*"
+
+  - package-ecosystem: gomod
+    directory: /supply-chain-security
+    schedule:
+      interval: weekly
+    groups:
+      go-supply-chain:
+        patterns:
+          - "*"
+
+  - package-ecosystem: terraform
+    directory: /cloud-platform-terraform
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: terraform
+    directory: /aws-eks-production-platform
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: terraform
+    directory: /aws-multi-account-landing-zone
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: terraform
+    directory: /aws-zero-trust-identity
+    schedule:
+      interval: weekly

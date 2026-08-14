@@ -1,0 +1,111 @@
+name: Repository Quality Gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: repository-quality-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  repository-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Install YAML parser
+        run: python -m pip install --disable-pip-version-check 'PyYAML==6.0.2'
+
+      - name: Repository contract
+        run: python tools/repo_audit.py
+
+      - name: Python syntax
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import py_compile
+
+          excluded = {'.git', '.terraform', '.venv', 'node_modules'}
+          failures = []
+          for path in Path('.').rglob('*.py'):
+              if excluded.intersection(path.parts) or 'templates' in path.parts or 'skeleton' in path.parts:
+                  continue
+              try:
+                  py_compile.compile(str(path), doraise=True)
+              except py_compile.PyCompileError as exc:
+                  failures.append(f'{path}: {exc.msg}')
+          if failures:
+              raise SystemExit('\n'.join(failures))
+          print('Python syntax: OK')
+          PY
+
+  github-actions:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: '1.26.x'
+
+      - name: Install actionlint
+        env:
+          GOBIN: ${{ runner.temp }}/bin
+        run: |
+          mkdir -p "$GOBIN"
+          go install github.com/rhysd/actionlint/cmd/actionlint@v1.7.12
+          echo "$GOBIN" >> "$GITHUB_PATH"
+
+      - name: Validate GitHub Actions
+        run: actionlint -color
+
+  shell:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: ShellCheck scripts
+        run: |
+          mapfile -d '' scripts < <(find . -type f -name '*.sh' \
+            -not -path './.git/*' \
+            -not -path '*/node_modules/*' \
+            -print0)
+          if ((${#scripts[@]} == 0)); then
+            echo 'No shell scripts found'
+            exit 0
+          fi
+          shellcheck "${scripts[@]}"
+
+  terraform-format:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.15.8'
+          terraform_wrapper: false
+
+      - name: Check Terraform formatting
+        run: terraform fmt -check -recursive -diff

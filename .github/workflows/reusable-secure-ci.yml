@@ -24,6 +24,7 @@ permissions:
 jobs:
   quality-and-sast:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
@@ -54,6 +55,7 @@ jobs:
 
   secrets:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
         with:
@@ -64,6 +66,9 @@ jobs:
     if: ${{ inputs.run-container-scan }}
     needs: [quality-and-sast, secrets]
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      TRIVY_IMAGE: aquasec/trivy:0.74.0
     steps:
       - uses: actions/checkout@v6
       - name: Build immutable test image
@@ -79,11 +84,18 @@ jobs:
           echo "Image runs as user $USER_VALUE"
       - name: Trivy image review
         run: |
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image --severity HIGH,CRITICAL --exit-code 0 "reusable-ci-sample:${GITHUB_SHA}"
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            "$TRIVY_IMAGE" image --severity HIGH,CRITICAL --exit-code 0 \
+            "reusable-ci-sample:${GITHUB_SHA}"
       - name: Generate CycloneDX SBOM
         working-directory: ${{ inputs.working-directory }}
         run: |
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD:/work" aquasec/trivy:latest image --format cyclonedx --output /work/sbom.cdx.json "reusable-ci-sample:${GITHUB_SHA}"
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v "$PWD:/work" \
+            "$TRIVY_IMAGE" image --format cyclonedx \
+            --output /work/sbom.cdx.json "reusable-ci-sample:${GITHUB_SHA}"
       - name: Upload SBOM
         uses: actions/upload-artifact@v7
         with:
