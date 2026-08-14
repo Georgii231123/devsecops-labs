@@ -1,0 +1,47 @@
+name: Grafana LGTM Observability Platform
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'grafana-observability-platform/**'
+      - '.github/workflows/grafana-observability-platform.yml'
+  pull_request:
+    paths:
+      - 'grafana-observability-platform/**'
+      - '.github/workflows/grafana-observability-platform.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  stack-smoke-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: grafana-observability-platform
+    steps:
+      - uses: actions/checkout@v6
+      - name: Validate Compose and Python
+        run: |
+          docker compose config >/dev/null
+          python3 -m compileall scripts
+      - name: Verify Tempo configuration
+        run: docker run --rm -v "$PWD/config/tempo.yaml:/etc/tempo/config.yaml:ro" grafana/tempo:3.0.2 --config.file=/etc/tempo/config.yaml --config.verify
+      - name: Start LGTM stack
+        run: docker compose up -d
+      - name: End-to-end smoke test
+        run: python3 scripts/smoke_test.py
+      - name: Upload health report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: lgtm-stack-health
+          path: grafana-observability-platform/artifacts/stack-health.json
+          if-no-files-found: ignore
+      - name: Diagnostics
+        if: failure()
+        run: docker compose logs
+      - name: Tear down
+        if: always()
+        run: docker compose down -v

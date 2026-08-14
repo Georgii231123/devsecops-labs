@@ -1,0 +1,1 @@
+# The sample service intentionally has no third-party runtime dependencies.

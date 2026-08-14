@@ -1,0 +1,91 @@
+name: Reusable Secure CI
+
+on:
+  workflow_call:
+    inputs:
+      working-directory:
+        description: Application directory inside the repository
+        required: true
+        type: string
+      python-version:
+        description: Python version used for quality checks
+        required: false
+        default: '3.13'
+        type: string
+      run-container-scan:
+        description: Build, inspect and scan the Docker image
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  quality-and-sast:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ inputs.python-version }}
+          cache: pip
+          cache-dependency-path: ${{ inputs.working-directory }}/requirements-dev.txt
+      - name: Install validation toolchain
+        working-directory: ${{ inputs.working-directory }}
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+      - name: Ruff
+        working-directory: ${{ inputs.working-directory }}
+        run: ruff check .
+      - name: Tests
+        working-directory: ${{ inputs.working-directory }}
+        run: pytest -q
+      - name: Bandit SAST
+        working-directory: ${{ inputs.working-directory }}
+        run: bandit -q app.py
+      - name: Dependency audit
+        working-directory: ${{ inputs.working-directory }}
+        run: |
+          if grep -Eq '^[[:space:]]*[^#[:space:]]' requirements.txt; then
+            pip-audit -r requirements.txt
+          else
+            echo "No third-party runtime dependencies to audit"
+          fi
+
+  secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v3
+
+  container-security:
+    if: ${{ inputs.run-container-scan }}
+    needs: [quality-and-sast, secrets]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Build immutable test image
+        working-directory: ${{ inputs.working-directory }}
+        run: docker build -t reusable-ci-sample:${GITHUB_SHA} .
+      - name: Enforce non-root image user
+        run: |
+          IMAGE="reusable-ci-sample:${GITHUB_SHA}"
+          USER_VALUE="$(docker image inspect "$IMAGE" --format '{{.Config.User}}')"
+          test -n "$USER_VALUE"
+          test "$USER_VALUE" != "0"
+          test "$USER_VALUE" != "root"
+          echo "Image runs as user $USER_VALUE"
+      - name: Trivy image review
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image --severity HIGH,CRITICAL --exit-code 0 "reusable-ci-sample:${GITHUB_SHA}"
+      - name: Generate CycloneDX SBOM
+        working-directory: ${{ inputs.working-directory }}
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD:/work" aquasec/trivy:latest image --format cyclonedx --output /work/sbom.cdx.json "reusable-ci-sample:${GITHUB_SHA}"
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v7
+        with:
+          name: reusable-ci-sbom
+          path: ${{ inputs.working-directory }}/sbom.cdx.json

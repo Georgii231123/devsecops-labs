@@ -1,0 +1,44 @@
+services:
+  loki:
+    image: grafana/loki:3.7.2
+    command: ["-config.file=/etc/loki/config.yaml"]
+    volumes:
+      - ./config/loki.yaml:/etc/loki/config.yaml:ro
+    ports:
+      - "3100:3100"
+
+  tempo:
+    image: grafana/tempo:3.0.2
+    command: ["--config.file=/etc/tempo/config.yaml", "--target=all"]
+    volumes:
+      - ./config/tempo.yaml:/etc/tempo/config.yaml:ro
+    tmpfs:
+      - /data/tempo:mode=1777
+      - /var/tempo:mode=1777
+    ports:
+      - "3200:3200"
+      - "4317:4317"
+      - "4318:4318"
+
+  mimir:
+    image: grafana/mimir:3.1.0
+    command: ["-config.file=/etc/mimir/config.yaml"]
+    volumes:
+      - ./config/mimir.yaml:/etc/mimir/config.yaml:ro
+    ports:
+      - "9009:9009"
+
+  grafana:
+    image: grafana/grafana:13.1.1
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    ports:
+      - "3000:3000"
+    depends_on:
+      - loki
+      - tempo
+      - mimir

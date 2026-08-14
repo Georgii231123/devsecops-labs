@@ -1,6 +1,6 @@
 # DevOps & DevSecOps Engineering Labs
 
-Hands-on engineering portfolio covering secure delivery, Kubernetes, cloud infrastructure, SRE, platform engineering, Linux automation, GitOps, database reliability, secrets management, messaging, distributed tracing and traffic engineering.
+Hands-on engineering portfolio covering secure delivery, Kubernetes, cloud infrastructure, SRE, platform engineering, Linux automation, GitOps, database reliability, secrets management, messaging, distributed tracing, traffic engineering, service mesh, chaos engineering, FinOps and reusable CI platforms.
 
 ## Portfolio map
 
@@ -20,6 +20,12 @@ Hands-on engineering portfolio covering secure delivery, Kubernetes, cloud infra
 | 12 | OpenTelemetry Distributed Tracing | Observability / Tracing | OpenTelemetry, OTLP, Jaeger, Flask |
 | 13 | Kubernetes Production Operations | Kubernetes / SRE | Kustomize, PDB, HPA, ResourceQuota, NetworkPolicy |
 | 14 | Nginx & HAProxy Load Balancing | Traffic Engineering | Nginx, HAProxy, health checks, failover |
+| 15 | AWS EKS Production Platform | Cloud Kubernetes / Platform | Terraform, EKS, KMS, IAM, Pod Identity, multi-AZ VPC |
+| 16 | Istio Service Mesh Security | Zero Trust / Service Mesh | Istio, mTLS, AuthorizationPolicy, canary, circuit breaking |
+| 17 | Chaos Engineering Reliability Lab | Resilience / SRE | Toxiproxy, Docker Compose, fault injection, recovery drills |
+| 18 | FinOps Governance Lab | Cost Governance / Platform | budgets, allocation policy, Kubernetes resources, CI reports |
+| 19 | Grafana LGTM Observability Platform | Observability Platform | Grafana, Loki, Tempo, Mimir, telemetry smoke tests |
+| 20 | Reusable GitHub Actions Secure CI | CI Platform / DevSecOps | workflow_call, Gitleaks, Bandit, Trivy, CycloneDX SBOM |
 
 ## Project guide
 
@@ -51,14 +57,29 @@ Hands-on engineering portfolio covering secure delivery, Kubernetes, cloud infra
 
 **Nginx & HAProxy Load Balancing.** [`edge-load-balancing/`](edge-load-balancing/) compares two proxy approaches and runs an automated backend-failure drill to verify continued traffic through the surviving node.
 
+**AWS EKS Production Platform.** [`aws-eks-production-platform/`](aws-eks-production-platform/) models a private multi-AZ EKS platform with KMS secret encryption, control-plane audit logs, Access Entries, private managed nodes and VPC CNI Pod Identity.
+
+**Istio Service Mesh Security.** [`istio-service-mesh-security/`](istio-service-mesh-security/) applies strict mTLS, workload-identity authorization, bounded retries, outlier ejection and explicit canary traffic policy.
+
+**Chaos Engineering.** [`chaos-engineering/`](chaos-engineering/) runs a real Toxiproxy latency experiment and proves both fault observability and recovery after fault removal/backend restart.
+
+**FinOps Governance.** [`finops-governance/`](finops-governance/) turns allocation metadata, budgets, Kubernetes resource controls and forecast headroom into reviewable CI gates and a report artifact.
+
+**Grafana LGTM Observability Platform.** [`grafana-observability-platform/`](grafana-observability-platform/) provisions Loki, Tempo and Mimir into Grafana and runs an end-to-end telemetry/readiness smoke test.
+
+**Reusable GitHub Actions Secure CI.** [`github-actions-platform/`](github-actions-platform/) exposes a `workflow_call` contract for linting, tests, SAST, secret detection, container policy, Trivy and SBOM generation, then self-tests that contract on a sample service.
+
 ## Engineering themes
 
 - infrastructure, delivery and operations as code;
 - CI/CD quality and security gates;
-- immutable artifacts and Git-based promotion;
-- cloud cost awareness and review-before-apply;
-- SLO-driven observability, metrics and distributed tracing;
-- self-service platform engineering;
+- immutable artifacts, SBOMs and Git-based promotion;
+- cloud platform design with private access and least privilege;
+- zero-trust east-west traffic with workload identity;
+- SLO-driven observability across metrics, logs and traces;
+- controlled failure injection and automated recovery verification;
+- FinOps allocation, budgets and capacity policy;
+- self-service platform engineering and reusable CI contracts;
 - Linux and Kubernetes operations with explicit runbooks;
 - least-privilege secrets management instead of credentials in source;
 - messaging correctness, dead-letter handling and recovery drills;

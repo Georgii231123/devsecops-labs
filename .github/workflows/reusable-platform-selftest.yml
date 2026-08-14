@@ -1,0 +1,25 @@
+name: Reusable CI Platform Self-Test
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'github-actions-platform/**'
+      - '.github/workflows/reusable-secure-ci.yml'
+      - '.github/workflows/reusable-platform-selftest.yml'
+  pull_request:
+    paths:
+      - 'github-actions-platform/**'
+      - '.github/workflows/reusable-secure-ci.yml'
+      - '.github/workflows/reusable-platform-selftest.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  secure-ci:
+    uses: ./.github/workflows/reusable-secure-ci.yml
+    with:
+      working-directory: github-actions-platform/sample
+      python-version: '3.13'
+      run-container-scan: true

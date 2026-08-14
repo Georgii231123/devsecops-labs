@@ -1,0 +1,17 @@
+name: Service CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  secure-ci:
+    uses: ./.github/workflows/reusable-secure-ci.yml
+    with:
+      working-directory: github-actions-platform/sample
+      python-version: '3.13'
+      run-container-scan: true
