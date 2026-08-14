@@ -1,0 +1,15 @@
+zones:
+  IT:
+    trust: low
+  OT-DMZ:
+    trust: medium
+  OT-Supervisory:
+    trust: high
+  OT-Engineering:
+    trust: high
+  OT-Control:
+    trust: critical
+  Monitoring:
+    trust: high
+  Internet:
+    trust: untrusted

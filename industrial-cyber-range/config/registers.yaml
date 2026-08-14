@@ -1,0 +1,27 @@
+registers:
+  0:
+    name: tank_level
+    access: read
+    scale: 10
+    unit: percent
+  1:
+    name: pressure
+    access: read
+    scale: 100
+    unit: bar
+  10:
+    name: pump_speed
+    access: write
+    min: 0
+    max: 100
+    unit: percent
+  11:
+    name: relief_valve
+    access: write
+    min: 0
+    max: 1
+  12:
+    name: safe_state
+    access: read
+    min: 0
+    max: 1

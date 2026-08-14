@@ -1,0 +1,32 @@
+default: deny
+rules:
+  - id: scada-read-plc
+    source: OT-Supervisory
+    destination: OT-Control
+    protocol: modbus-tcp
+    actions: [read]
+    effect: allow
+  - id: engineering-control
+    source: OT-Engineering
+    destination: OT-Control
+    protocol: modbus-tcp
+    actions: [read, write]
+    effect: allow
+  - id: monitoring-scrape
+    source: Monitoring
+    destination: OT-Control
+    protocol: http
+    actions: [read]
+    effect: allow
+  - id: plc-to-supervisory
+    source: OT-Control
+    destination: OT-Supervisory
+    protocol: opcua
+    actions: [publish]
+    effect: allow
+  - id: supervisory-to-dmz
+    source: OT-Supervisory
+    destination: OT-DMZ
+    protocol: mqtt
+    actions: [publish]
+    effect: allow
