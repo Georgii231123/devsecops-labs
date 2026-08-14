@@ -1,0 +1,82 @@
+name: Multi-Cluster GitOps Platform
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "multi-cluster-gitops/**"
+      - ".github/workflows/multi-cluster-gitops.yml"
+  pull_request:
+    paths:
+      - "multi-cluster-gitops/**"
+      - ".github/workflows/multi-cluster-gitops.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-and-reconcile:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: multi-cluster-gitops
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install validation dependencies
+        run: python -m pip install --disable-pip-version-check pyyaml==6.0.3
+
+      - name: Platform policy assertions
+        run: python scripts/validate_platform.py
+
+      - name: Install Argo CD, kind and kubeconform
+        run: |
+          curl -fsSL -o /tmp/argocd https://github.com/argoproj/argo-cd/releases/download/v3.4.2/argocd-linux-amd64
+          sudo install -m 0755 /tmp/argocd /usr/local/bin/argocd
+          curl -fsSL -o /tmp/kind https://kind.sigs.k8s.io/dl/v0.32.0/kind-linux-amd64
+          sudo install -m 0755 /tmp/kind /usr/local/bin/kind
+          curl -fsSL https://github.com/yannh/kubeconform/releases/download/v0.7.0/kubeconform-linux-amd64.tar.gz | sudo tar -xz -C /usr/local/bin kubeconform
+          argocd version --client
+          kind version
+          kubeconform -v
+
+      - name: Render and schema-check workload state
+        run: |
+          mkdir -p artifacts
+          kubectl kustomize apps/demo/overlays/eu > artifacts/eu.yaml
+          kubectl kustomize apps/demo/overlays/us > artifacts/us.yaml
+          kubeconform -strict -summary artifacts/eu.yaml artifacts/us.yaml
+
+      - name: Validate Argo resources against management API server
+        run: |
+          kind create cluster --name management --wait 60s
+          kubectl --context kind-management create namespace argocd
+          kubectl --context kind-management apply -f https://raw.githubusercontent.com/argoproj/argo-cd/v3.4.2/manifests/crds/appproject-crd.yaml
+          kubectl --context kind-management apply -f https://raw.githubusercontent.com/argoproj/argo-cd/v3.4.2/manifests/crds/applicationset-crd.yaml
+          kubectl --context kind-management wait --for=condition=Established crd/appprojects.argoproj.io --timeout=60s
+          kubectl --context kind-management wait --for=condition=Established crd/applicationsets.argoproj.io --timeout=60s
+          kubectl --context kind-management apply --server-side -f argocd/appproject.yaml
+          kubectl --context kind-management apply --server-side -f argocd/applicationset.yaml
+          kubectl --context kind-management get appprojects,applicationsets -n argocd
+
+      - name: Multi-cluster drift and reconciliation drill
+        run: bash scripts/drift_drill.sh
+
+      - name: Upload reconciliation evidence
+        uses: actions/upload-artifact@v7
+        with:
+          name: multi-cluster-gitops-evidence
+          path: multi-cluster-gitops/artifacts/
+
+      - name: Cleanup clusters
+        if: always()
+        run: |
+          kind delete cluster --name management || true
+          kind delete cluster --name workload-eu || true
+          kind delete cluster --name workload-us || true

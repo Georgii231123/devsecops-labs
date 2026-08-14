@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: platform-workloads
+  namespace: argocd
+spec:
+  description: Restricted project for multi-cluster platform workloads
+  sourceRepos:
+    - https://github.com/Georgii231123/devsecops-labs.git
+  destinations:
+    - name: workload-eu
+      namespace: payments
+    - name: workload-us
+      namespace: payments
+  clusterResourceWhitelist: []
+  namespaceResourceWhitelist:
+    - group: "*"
+      kind: "*"
+  orphanedResources:
+    warn: true

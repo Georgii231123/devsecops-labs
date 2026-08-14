@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: payments-fleet
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions:
+    - missingkey=error
+  generators:
+    - list:
+        elements:
+          - cluster: workload-eu
+            overlay: eu
+            tier: staging
+          - cluster: workload-us
+            overlay: us
+            tier: production
+  template:
+    metadata:
+      name: 'payments-{{.cluster}}'
+      labels:
+        app.kubernetes.io/part-of: payments-platform
+        platform.example/tier: '{{.tier}}'
+      annotations:
+        argocd.argoproj.io/sync-wave: "10"
+    spec:
+      project: platform-workloads
+      source:
+        repoURL: https://github.com/Georgii231123/devsecops-labs.git
+        targetRevision: main
+        path: 'multi-cluster-gitops/apps/demo/overlays/{{.overlay}}'
+      destination:
+        name: '{{.cluster}}'
+        namespace: payments
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true
