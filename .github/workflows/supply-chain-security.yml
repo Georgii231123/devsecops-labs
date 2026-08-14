@@ -1,0 +1,28 @@
+name: Software Supply Chain Security
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "supply-chain-security/**"
+      - ".github/workflows/reusable-supply-chain-build.yml"
+      - ".github/workflows/supply-chain-security.yml"
+  pull_request:
+    paths:
+      - "supply-chain-security/**"
+      - ".github/workflows/reusable-supply-chain-build.yml"
+      - ".github/workflows/supply-chain-security.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+  attestations: write
+
+jobs:
+  trusted-builder:
+    uses: ./.github/workflows/reusable-supply-chain-build.yml
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
