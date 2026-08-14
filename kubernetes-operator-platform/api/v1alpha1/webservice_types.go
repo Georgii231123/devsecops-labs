@@ -17,9 +17,12 @@ type WebServiceStatus struct {
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:shortName=websvc
+// +kubebuilder:printcolumn:name="Image",type=string,JSONPath=`.spec.image`
+// +kubebuilder:printcolumn:name="Ready",type=integer,JSONPath=`.status.readyReplicas`
 type WebService struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
+
 	Spec   WebServiceSpec   `json:"spec,omitempty"`
 	Status WebServiceStatus `json:"status,omitempty"`
 }
@@ -31,4 +34,6 @@ type WebServiceList struct {
 	Items           []WebService `json:"items"`
 }
 
-func init() { SchemeBuilder.Register(&WebService{}, &WebServiceList{}) }
+func init() {
+	SchemeBuilder.Register(&WebService{}, &WebServiceList{})
+}

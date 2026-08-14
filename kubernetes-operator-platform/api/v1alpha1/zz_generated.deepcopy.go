@@ -20,13 +20,47 @@ func (in *WebService) DeepCopyInto(out *WebService) {
 		copy(out.Status.Conditions, in.Status.Conditions)
 	}
 }
-func (in *WebService) DeepCopy() *WebService { if in == nil { return nil }; out := new(WebService); in.DeepCopyInto(out); return out }
-func (in *WebService) DeepCopyObject() runtime.Object { if c := in.DeepCopy(); c != nil { return c }; return nil }
+
+func (in *WebService) DeepCopy() *WebService {
+	if in == nil {
+		return nil
+	}
+	out := new(WebService)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *WebService) DeepCopyObject() runtime.Object {
+	if c := in.DeepCopy(); c != nil {
+		return c
+	}
+	return nil
+}
+
 func (in *WebServiceList) DeepCopyInto(out *WebServiceList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
 	in.ListMeta.DeepCopyInto(&out.ListMeta)
-	if in.Items != nil { out.Items = make([]WebService, len(in.Items)); for i := range in.Items { in.Items[i].DeepCopyInto(&out.Items[i]) } }
+	if in.Items != nil {
+		out.Items = make([]WebService, len(in.Items))
+		for i := range in.Items {
+			in.Items[i].DeepCopyInto(&out.Items[i])
+		}
+	}
 }
-func (in *WebServiceList) DeepCopy() *WebServiceList { if in == nil { return nil }; out := new(WebServiceList); in.DeepCopyInto(out); return out }
-func (in *WebServiceList) DeepCopyObject() runtime.Object { if c := in.DeepCopy(); c != nil { return c }; return nil }
+
+func (in *WebServiceList) DeepCopy() *WebServiceList {
+	if in == nil {
+		return nil
+	}
+	out := new(WebServiceList)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *WebServiceList) DeepCopyObject() runtime.Object {
+	if c := in.DeepCopy(); c != nil {
+		return c
+	}
+	return nil
+}
