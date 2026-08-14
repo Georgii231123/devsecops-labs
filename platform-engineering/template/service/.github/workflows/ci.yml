@@ -27,4 +27,4 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - run: docker build -t __SERVICE_SLUG__:ci .
-      - run: docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image --severity HIGH,CRITICAL --exit-code 0 __SERVICE_SLUG__:ci
+      - run: docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:0.74.0 image --severity HIGH,CRITICAL --exit-code 0 __SERVICE_SLUG__:ci

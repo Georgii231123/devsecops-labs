@@ -29,4 +29,4 @@ jobs:
       - name: Istio static analysis
         run: docker run --rm -v "$PWD:/work" istio/istioctl:1.30.3 analyze --use-kube=false /work/manifests
       - name: Trivy Kubernetes review
-        run: docker run --rm -v "$PWD:/src" aquasec/trivy:latest config --exit-code 0 /src/manifests
+        run: docker run --rm -v "$PWD:/src" aquasec/trivy:0.74.0 config --exit-code 0 /src/manifests

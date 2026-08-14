@@ -36,5 +36,5 @@ jobs:
           fi
       - name: Trivy rendered Kubernetes manifests
         run: |
-          docker run --rm -v /tmp:/rendered aquasec/trivy:latest config --exit-code 0 /rendered/dev.yaml
-          docker run --rm -v /tmp:/rendered aquasec/trivy:latest config --exit-code 0 /rendered/prod.yaml
+          docker run --rm -v /tmp:/rendered aquasec/trivy:0.74.0 config --exit-code 0 /rendered/dev.yaml
+          docker run --rm -v /tmp:/rendered aquasec/trivy:0.74.0 config --exit-code 0 /rendered/prod.yaml

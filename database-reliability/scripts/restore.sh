@@ -12,4 +12,4 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 backup="$1"
 
 test -s "$backup"
-cat "$backup" | docker compose -f "$ROOT/docker-compose.yml" exec -T postgres pg_restore -U "$USER" -d "$DB" --clean --if-exists --no-owner --no-privileges
+docker compose -f "$ROOT/docker-compose.yml" exec -T postgres pg_restore -U "$USER" -d "$DB" --clean --if-exists --no-owner --no-privileges < "$backup"

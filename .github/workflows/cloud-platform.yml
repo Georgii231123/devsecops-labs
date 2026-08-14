@@ -29,6 +29,6 @@ jobs:
           docker run --rm -v "$PWD:/workspace" -w /workspace hashicorp/terraform:1.12.2 init -backend=false
           docker run --rm -v "$PWD:/workspace" -w /workspace hashicorp/terraform:1.12.2 validate
       - name: Checkov
-        run: docker run --rm -v "$PWD:/src" bridgecrew/checkov:latest -d /src --framework terraform --compact --soft-fail
+        run: docker run --rm -v "$PWD:/src" bridgecrew/checkov:3.3.9 -d /src --framework terraform --compact --soft-fail
       - name: Trivy IaC
-        run: docker run --rm -v "$PWD:/src" aquasec/trivy:latest config --exit-code 0 /src
+        run: docker run --rm -v "$PWD:/src" aquasec/trivy:0.74.0 config --exit-code 0 /src

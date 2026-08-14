@@ -17,6 +17,9 @@ README_PATH = ROOT / "README.md"
 SKIP_PARTS = {".git", ".terraform", ".venv", "node_modules", "__pycache__"}
 INTENTIONAL_RISK_PARTS = {"vulnerable", "fixtures"}
 TEXT_CONFIG_SUFFIXES = {".yml", ".yaml", ".sh", ".tf", ".hcl"}
+LATEST_LITERAL_ALLOWLIST = {
+    Path("kyverno-admission-control/policies/disallow-latest.yaml"),
+}
 FORBIDDEN_NAMES = {
     ".env",
     "id_rsa",
@@ -129,9 +132,7 @@ def check_serialized_files() -> None:
                 if "{{" in text or "{%" in text:
                     continue
                 list(yaml.load_all(text, Loader=yaml.BaseLoader))
-        except (UnicodeDecodeError, json.JSONDecodeError, tomllib.TOMLDecodeError, Exception) as exc:
-            # YAML parser exceptions are intentionally handled here without importing
-            # implementation-specific exception classes.
+        except Exception as exc:  # YAML loaders use implementation-specific errors.
             fail(f"Cannot parse {path.relative_to(ROOT)}: {exc}")
 
 
@@ -150,6 +151,9 @@ def check_no_floating_latest() -> None:
     for path in ROOT.rglob("*"):
         if not path.is_file() or should_skip(path):
             continue
+        rel = path.relative_to(ROOT)
+        if rel in LATEST_LITERAL_ALLOWLIST:
+            continue
         if INTENTIONAL_RISK_PARTS.intersection(path.parts):
             continue
         if path.name not in {"Dockerfile", "Makefile"} and path.suffix not in TEXT_CONFIG_SUFFIXES:
@@ -158,7 +162,7 @@ def check_no_floating_latest() -> None:
         if ":latest" in text:
             for number, line in enumerate(text.splitlines(), 1):
                 if ":latest" in line and not line.lstrip().startswith("#"):
-                    fail(f"Floating container tag ':latest' in {path.relative_to(ROOT)}:{number}")
+                    fail(f"Floating container tag ':latest' in {rel}:{number}")
 
 
 def check_sensitive_files() -> None:

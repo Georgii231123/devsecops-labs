@@ -27,7 +27,7 @@ jobs:
       - name: Start PostgreSQL
         run: |
           docker compose up -d postgres
-          for i in $(seq 1 30); do
+          for _ in {1..30}; do
             if docker compose exec -T postgres pg_isready -U appuser -d appdb; then exit 0; fi
             sleep 2
           done

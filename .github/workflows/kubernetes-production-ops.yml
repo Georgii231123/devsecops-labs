@@ -27,4 +27,4 @@ jobs:
       - name: Validate operational controls
         run: python3 scripts/validate.py
       - name: Scan manifests
-        run: docker run --rm -v /tmp:/rendered aquasec/trivy:latest config --exit-code 0 /rendered/prod.yaml
+        run: docker run --rm -v /tmp:/rendered aquasec/trivy:0.74.0 config --exit-code 0 /rendered/prod.yaml

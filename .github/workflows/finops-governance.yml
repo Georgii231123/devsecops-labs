@@ -34,7 +34,7 @@ jobs:
       - name: Kubernetes allocation policy
         run: python scripts/resource_policy.py
       - name: Trivy manifest review
-        run: docker run --rm -v "$PWD:/src" aquasec/trivy:latest config --exit-code 0 /src/k8s
+        run: docker run --rm -v "$PWD:/src" aquasec/trivy:0.74.0 config --exit-code 0 /src/k8s
       - name: Upload FinOps report
         uses: actions/upload-artifact@v7
         with:

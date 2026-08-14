@@ -13,6 +13,6 @@ for migration in "$ROOT"/migrations/*.sql; do
     continue
   fi
   echo "apply $version"
-  cat "$migration" | docker compose -f "$ROOT/docker-compose.yml" exec -T postgres psql -v ON_ERROR_STOP=1 -U "$USER" -d "$DB"
+  docker compose -f "$ROOT/docker-compose.yml" exec -T postgres psql -v ON_ERROR_STOP=1 -U "$USER" -d "$DB" < "$migration"
   docker compose -f "$ROOT/docker-compose.yml" exec -T postgres psql -v ON_ERROR_STOP=1 -U "$USER" -d "$DB" -c "INSERT INTO schema_migrations(version) VALUES ('$version')"
 done
