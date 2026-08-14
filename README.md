@@ -1,6 +1,6 @@
 # DevOps & DevSecOps Engineering Labs
 
-Hands-on engineering portfolio covering secure delivery, Kubernetes, cloud infrastructure, SRE, platform engineering, Linux automation, GitOps, database reliability, secrets management, messaging, distributed tracing, traffic engineering, service mesh, chaos engineering, FinOps and reusable CI platforms.
+Hands-on engineering portfolio covering secure delivery, Kubernetes, cloud infrastructure, SRE, platform engineering, Linux automation, GitOps, database reliability, secrets management, messaging, distributed tracing, traffic engineering, service mesh, chaos engineering, FinOps, reusable CI platforms, multi-cluster operations, software supply-chain security and incident response.
 
 ## Portfolio map
 
@@ -26,6 +26,9 @@ Hands-on engineering portfolio covering secure delivery, Kubernetes, cloud infra
 | 18 | FinOps Governance Lab | Cost Governance / Platform | budgets, allocation policy, Kubernetes resources, CI reports |
 | 19 | Grafana LGTM Observability Platform | Observability Platform | Grafana, Loki, Tempo, Mimir, telemetry smoke tests |
 | 20 | Reusable GitHub Actions Secure CI | CI Platform / DevSecOps | workflow_call, Gitleaks, Bandit, Trivy, CycloneDX SBOM |
+| 21 | Multi-Cluster GitOps Platform | Multi-Cluster GitOps / Platform | Argo CD, ApplicationSet, Kustomize, kind, drift reconciliation |
+| 22 | Software Supply Chain Security | Supply Chain Security / DevSecOps | Cosign, Syft, GitHub attestations, reproducible builds, CycloneDX |
+| 23 | SRE Incident Response Game Day | Incident Response / SRE | Prometheus, Docker Compose, paging alerts, runbooks, MTTA/MTTR |
 
 ## Project guide
 
@@ -69,14 +72,23 @@ Hands-on engineering portfolio covering secure delivery, Kubernetes, cloud infra
 
 **Reusable GitHub Actions Secure CI.** [`github-actions-platform/`](github-actions-platform/) exposes a `workflow_call` contract for linting, tests, SAST, secret detection, container policy, Trivy and SBOM generation, then self-tests that contract on a sample service.
 
+**Multi-Cluster GitOps Platform.** [`multi-cluster-gitops/`](multi-cluster-gitops/) models one management plane and two workload clusters with ApplicationSet placement, Kustomize overlays, server-side Argo API validation and real drift/reconciliation drills.
+
+**Software Supply Chain Security.** [`supply-chain-security/`](supply-chain-security/) uses a reusable SHA-pinned builder to prove reproducible Go builds, generate CycloneDX SBOMs, sign and verify release artifacts with Cosign and emit GitHub build provenance.
+
+**SRE Incident Response Game Day.** [`sre-incident-game-day/`](sre-incident-game-day/) injects a controlled 5xx incident, waits for a real Prometheus paging alert, executes runbook remediation and generates MTTA/MTTR timeline and postmortem evidence.
+
 ## Engineering themes
 
 - infrastructure, delivery and operations as code;
 - CI/CD quality and security gates;
-- immutable artifacts, SBOMs and Git-based promotion;
+- immutable artifacts, SBOMs, signatures, attestations and Git-based promotion;
+- reproducible builds and verifiable software supply chains;
 - cloud platform design with private access and least privilege;
+- multi-cluster GitOps fleet placement, drift detection and convergence;
 - zero-trust east-west traffic with workload identity;
 - SLO-driven observability across metrics, logs and traces;
+- executable incident-response runbooks with MTTA/MTTR evidence;
 - controlled failure injection and automated recovery verification;
 - FinOps allocation, budgets and capacity policy;
 - self-service platform engineering and reusable CI contracts;
