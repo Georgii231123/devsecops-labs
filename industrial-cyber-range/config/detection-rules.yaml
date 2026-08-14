@@ -1,0 +1,11 @@
+authorized_modbus_writers:
+  - engineering-01
+  - scada-01
+allowed_opcua_clients:
+  - scada-01
+  - historian-01
+allowed_mqtt_prefixes:
+  - plant/
+thresholds:
+  pressure_high_bar: 5.5
+  write_burst_per_minute: 20

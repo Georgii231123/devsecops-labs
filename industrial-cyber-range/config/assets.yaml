@@ -1,0 +1,36 @@
+assets:
+  - id: plc-01
+    type: controller
+    zone: OT-Control
+    criticality: critical
+    protocols: [modbus-tcp]
+  - id: scada-01
+    type: supervisory
+    zone: OT-Supervisory
+    criticality: high
+    protocols: [http, modbus-tcp]
+  - id: opcua-01
+    type: gateway
+    zone: OT-Supervisory
+    criticality: high
+    protocols: [opcua, modbus-tcp]
+  - id: mqtt-gateway-01
+    type: telemetry-gateway
+    zone: OT-DMZ
+    criticality: medium
+    protocols: [mqtt]
+  - id: prometheus-01
+    type: monitoring
+    zone: Monitoring
+    criticality: medium
+    protocols: [http]
+  - id: engineering-01
+    type: engineering-workstation
+    zone: OT-Engineering
+    criticality: high
+    protocols: [modbus-tcp]
+  - id: it-workstation-01
+    type: workstation
+    zone: IT
+    criticality: low
+    protocols: [http]
