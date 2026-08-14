@@ -1,0 +1,36 @@
+name: OpenTelemetry Tracing Lab
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'opentelemetry-tracing/**'
+      - '.github/workflows/opentelemetry-tracing.yml'
+  pull_request:
+    paths:
+      - 'opentelemetry-tracing/**'
+      - '.github/workflows/opentelemetry-tracing.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  end-to-end:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: opentelemetry-tracing
+    steps:
+      - uses: actions/checkout@v6
+      - name: Static validation
+        run: |
+          docker compose config >/dev/null
+          python3 -m compileall frontend backend
+          bash -n scripts/smoke.sh
+      - name: Build and start tracing stack
+        run: docker compose up --build -d
+      - name: Verify propagated traces
+        run: ./scripts/smoke.sh
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs

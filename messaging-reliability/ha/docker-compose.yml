@@ -1,0 +1,20 @@
+services:
+  rabbit1:
+    image: rabbitmq:4.1-management
+    hostname: rabbit1
+    environment: &rabbit-env
+      RABBITMQ_ERLANG_COOKIE: portfolio-cluster-cookie
+      RABBITMQ_DEFAULT_USER: lab
+      RABBITMQ_DEFAULT_PASS: lab
+    ports:
+      - "15672:15672"
+  rabbit2:
+    image: rabbitmq:4.1-management
+    hostname: rabbit2
+    environment: *rabbit-env
+    depends_on: [rabbit1]
+  rabbit3:
+    image: rabbitmq:4.1-management
+    hostname: rabbit3
+    environment: *rabbit-env
+    depends_on: [rabbit1]

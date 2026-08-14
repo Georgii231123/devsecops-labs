@@ -1,0 +1,38 @@
+name: Messaging Reliability Lab
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'messaging-reliability/**'
+      - '.github/workflows/messaging-reliability.yml'
+  pull_request:
+    paths:
+      - 'messaging-reliability/**'
+      - '.github/workflows/messaging-reliability.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  rabbitmq-drill:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: messaging-reliability
+    steps:
+      - uses: actions/checkout@v6
+      - name: Validate Compose definitions
+        run: |
+          docker compose config >/dev/null
+          docker compose -f ha/docker-compose.yml config >/dev/null
+          bash -n ha/bootstrap-cluster.sh
+      - name: Start broker
+        run: docker compose up -d rabbitmq
+      - name: Quorum and dead-letter drill
+        run: python3 scripts/bootstrap_and_test.py
+      - name: Verify Prometheus endpoint
+        run: curl --fail --retry 10 --retry-delay 2 http://localhost:15692/metrics | grep -q rabbitmq_
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs rabbitmq
