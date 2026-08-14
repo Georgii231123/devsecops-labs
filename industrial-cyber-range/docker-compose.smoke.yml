@@ -1,0 +1,16 @@
+services:
+  mqtt:
+    image: eclipse-mosquitto:2.1.2-alpine
+    command: mosquitto -c /mosquitto-no-auth.conf
+    volumes:
+      - ./mqtt/mosquitto.conf:/mosquitto-no-auth.conf:ro
+    ports:
+      - 127.0.0.1:1883:1883
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID

@@ -52,8 +52,6 @@ services:
     command: mosquitto -c /mosquitto-no-auth.conf
     volumes:
       - ./mqtt/mosquitto.conf:/mosquitto-no-auth.conf:ro
-    ports:
-      - 127.0.0.1:1883:1883
     networks:
       - ot_supervisory
       - ot_dmz

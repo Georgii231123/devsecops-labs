@@ -13,7 +13,14 @@ Run `python scripts/opcua_smoke.py`. It creates an isolated OPC UA server on por
 
 ## MQTT smoke fails
 
-Start only the broker with `docker compose up -d mqtt`, verify it is listening on 127.0.0.1:1883, and then run `python scripts/mqtt_smoke.py`.
+The main broker intentionally has no host-published port because it belongs to internal OT networks. Start the dedicated local smoke topology instead:
+
+```bash
+docker compose -f docker-compose.smoke.yml up -d mqtt
+python scripts/mqtt_smoke.py
+docker compose -f docker-compose.smoke.yml logs mqtt
+docker compose -f docker-compose.smoke.yml down -v
+```
 
 ## Process entered safe state
 
@@ -23,5 +30,6 @@ Inspect the incident evidence and PLC audit events first. In the simulator, safe
 
 ```bash
 docker compose down -v
+docker compose -f docker-compose.smoke.yml down -v
 rm -rf artifacts
 ```

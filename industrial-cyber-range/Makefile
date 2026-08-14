@@ -17,8 +17,9 @@ opcua:
 	python scripts/opcua_smoke.py
 
 mqtt:
-	docker compose up -d mqtt
+	docker compose -f docker-compose.smoke.yml up -d mqtt
 	python scripts/mqtt_smoke.py
+	docker compose -f docker-compose.smoke.yml down -v
 
 drill:
 	python scripts/incident_drill.py --scenario unauthorized-modbus-write

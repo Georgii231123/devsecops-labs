@@ -35,7 +35,7 @@ The process contains a tank, pump, pressure model and relief valve. The PLC expo
 - zone-based allow/deny policy for IT, DMZ, supervisory and control networks;
 - detection rules for unauthorized writes, forbidden zone crossings, unknown OPC UA clients, unexpected MQTT topics and unsafe pressure;
 - incident drills that generate structured evidence without touching external systems;
-- Docker Compose topology with local-only host bindings and internal OT networks.
+- Docker Compose topology with local-only management bindings and internal OT networks.
 
 ## Quick start
 
@@ -49,12 +49,12 @@ python scripts/modbus_smoke.py
 python scripts/opcua_smoke.py
 ```
 
-For the broker smoke test:
+The main Compose topology keeps MQTT inside the simulated OT networks. A separate smoke topology exposes only the broker on loopback so a local client can prove a real MQTT round trip without weakening the primary segmentation model:
 
 ```bash
-docker compose up -d mqtt
+docker compose -f docker-compose.smoke.yml up -d mqtt
 python scripts/mqtt_smoke.py
-docker compose down -v
+docker compose -f docker-compose.smoke.yml down -v
 ```
 
 Run a controlled incident drill:

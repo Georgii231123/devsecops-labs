@@ -38,8 +38,10 @@ jobs:
         run: bandit -q -r otlab scripts -ll
       - name: Architecture contract
         run: python scripts/validate_architecture.py
-      - name: Validate Compose model
-        run: docker compose config -q
+      - name: Validate Compose models
+        run: |
+          docker compose config -q
+          docker compose -f docker-compose.smoke.yml config -q
 
   protocol-and-incident-drills:
     runs-on: ubuntu-24.04
@@ -63,7 +65,7 @@ jobs:
         run: python scripts/opcua_smoke.py
       - name: Start MQTT broker
         run: |
-          docker compose up -d mqtt
+          docker compose -f docker-compose.smoke.yml up -d mqtt
           python - <<'PY'
           import socket
           import time
@@ -103,7 +105,7 @@ jobs:
           path: industrial-cyber-range/artifacts/*.json
       - name: Broker logs on failure
         if: failure()
-        run: docker compose logs --no-color mqtt
+        run: docker compose -f docker-compose.smoke.yml logs --no-color mqtt
       - name: Cleanup
         if: always()
-        run: docker compose down -v
+        run: docker compose -f docker-compose.smoke.yml down -v
