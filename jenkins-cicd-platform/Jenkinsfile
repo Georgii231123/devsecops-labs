@@ -1,0 +1,7 @@
+@Library('devops-shared-library@main') _
+
+securePipeline {
+    serviceName = 'demo-service'
+    imageRepository = 'registry.example.internal/platform/demo-service'
+    productionEnvironment = 'production'
+}

@@ -1,0 +1,7 @@
+{
+  "bound_service_account_names": ["demo-app"],
+  "bound_service_account_namespaces": ["demo"],
+  "policies": ["demo-app-read"],
+  "ttl": "15m",
+  "max_ttl": "1h"
+}

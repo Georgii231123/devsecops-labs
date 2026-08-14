@@ -1,0 +1,30 @@
+name: Jenkins CI/CD Platform
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'jenkins-cicd-platform/**'
+      - '.github/workflows/jenkins-platform.yml'
+  pull_request:
+    paths:
+      - 'jenkins-cicd-platform/**'
+      - '.github/workflows/jenkins-platform.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: jenkins-cicd-platform
+    steps:
+      - uses: actions/checkout@v6
+      - name: Validate Compose
+        run: docker compose config >/dev/null
+      - name: Platform policy checks
+        run: python3 scripts/validate.py
+      - name: Build controller definition
+        run: docker build --check .
