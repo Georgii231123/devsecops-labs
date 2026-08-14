@@ -1,0 +1,16 @@
+{
+  "process_lsm": {
+    "process": {
+      "binary": "/usr/bin/cat",
+      "pod": {
+        "namespace": "payments",
+        "name": "api-7f7f65f7b8-z9x2k"
+      }
+    },
+    "function_name": "file_open",
+    "args": [
+      {"file_arg": {"path": "/etc/shadow"}}
+    ],
+    "policy_name": "observe-sensitive-file-access"
+  }
+}

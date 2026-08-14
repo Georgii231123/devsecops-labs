@@ -1,0 +1,41 @@
+name: eBPF Runtime Security
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ebpf-runtime-security/**'
+      - '.github/workflows/ebpf-runtime-security.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'ebpf-runtime-security/**'
+      - '.github/workflows/ebpf-runtime-security.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  policy-regression:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: ebpf-runtime-security
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - name: Install test dependencies
+        run: python -m pip install -r requirements-dev.txt
+      - name: Validate tracing-policy contracts
+        run: python scripts/validate_policies.py policies
+      - name: Runtime event regression
+        run: python -m pytest -q
+      - name: Verify pinned tetra CLI artifact
+        run: |
+          curl -fsSLo tetra.tar.gz https://github.com/cilium/tetragon/releases/download/v1.7.0/tetra-linux-amd64.tar.gz
+          echo 'a765f8f4980accc02b9b69d41c8547a011c3674ffeb1c84321e46f0c712858d9  tetra.tar.gz' | sha256sum -c -
+          tar -xzf tetra.tar.gz
+          ./tetra --help >/dev/null

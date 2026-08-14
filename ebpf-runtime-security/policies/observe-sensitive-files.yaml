@@ -1,0 +1,24 @@
+apiVersion: cilium.io/v1alpha1
+kind: TracingPolicy
+metadata:
+  name: observe-sensitive-file-access
+spec:
+  podSelector:
+    matchLabels:
+      runtime-security: enabled
+  options:
+    - name: policy-mode
+      value: monitoring
+  lsmhooks:
+    - hook: file_open
+      message: sensitive file opened
+      args:
+        - index: 0
+          type: file
+      selectors:
+        - matchArgs:
+            - index: 0
+              operator: Equal
+              values:
+                - /etc/shadow
+                - /etc/sudoers

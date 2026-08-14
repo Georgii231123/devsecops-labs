@@ -1,0 +1,27 @@
+apiVersion: cilium.io/v1alpha1
+kind: TracingPolicy
+metadata:
+  name: enforce-runtime-test-file
+spec:
+  podSelector:
+    matchLabels:
+      runtime-security: enabled
+  options:
+    - name: policy-mode
+      value: enforcement
+  kprobes:
+    - call: fd_install
+      syscall: false
+      args:
+        - index: 0
+          type: int
+        - index: 1
+          type: file
+      selectors:
+        - matchArgs:
+            - index: 1
+              operator: Equal
+              values:
+                - /tmp/tetragon-denied
+          matchActions:
+            - action: Sigkill
