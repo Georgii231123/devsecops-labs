@@ -1,6 +1,6 @@
 # DevOps & DevSecOps Engineering Labs
 
-Hands-on engineering portfolio covering secure delivery, Kubernetes, cloud infrastructure, SRE, platform engineering, Linux automation, GitOps, database reliability, secrets management, messaging, distributed tracing, traffic engineering, service mesh, chaos engineering, FinOps, reusable CI platforms, multi-cluster operations, software supply-chain security, incident response, admission control, IAM security, vulnerability management, Kubernetes operators, internal developer portals and multi-account cloud governance.
+Hands-on engineering portfolio covering secure delivery, Kubernetes, cloud infrastructure, SRE, platform engineering, Linux automation, GitOps, database reliability, secrets management, messaging, distributed tracing, traffic engineering, service mesh, chaos engineering, FinOps, reusable CI platforms, multi-cluster operations, software supply-chain security, incident response, admission control, IAM security, vulnerability management, Kubernetes operators, internal developer portals, multi-account cloud governance, eBPF runtime security, multi-tenancy and federated cloud identity.
 
 ## Portfolio map
 
@@ -35,6 +35,9 @@ Hands-on engineering portfolio covering secure delivery, Kubernetes, cloud infra
 | 27 | Kubernetes Operator Platform | Kubernetes Controllers / Platform Engineering | Go, controller-runtime, CRD, envtest, RBAC |
 | 28 | Internal Developer Portal | Platform Engineering / Developer Experience | Backstage catalog, Scaffolder, TechDocs, golden path |
 | 29 | AWS Multi-Account Landing Zone | Cloud Governance / Platform Security | Terraform, AWS Organizations, SCP, CloudTrail, KMS, Config |
+| 30 | eBPF Runtime Security | Runtime Security / eBPF | Tetragon, TracingPolicy, LSM hooks, runtime event triage |
+| 31 | Kubernetes Multi-Tenant Platform | Kubernetes Platform / Isolation | kind, RBAC, Pod Security, ResourceQuota, NetworkPolicy |
+| 32 | AWS Zero-Trust CI Identity | Cloud Identity / Zero Trust | GitHub OIDC, STS, IAM, Terraform, permissions boundaries |
 
 ## Project guide
 
@@ -96,6 +99,12 @@ Hands-on engineering portfolio covering secure delivery, Kubernetes, cloud infra
 
 **AWS Multi-Account Landing Zone.** [`aws-multi-account-landing-zone/`](aws-multi-account-landing-zone/) models AWS Organizations and OU hierarchy, SCP guardrails, guarded account vending, delegated security administration and a centralized KMS/S3/organization-CloudTrail audit path. Native Terraform tests use a mocked AWS provider, so the architecture can be regression-tested without creating cloud resources.
 
+**eBPF Runtime Security.** [`ebpf-runtime-security/`](ebpf-runtime-security/) defines scoped Tetragon monitoring and enforcement policies, validates the tracing-policy contract, triages runtime events and includes a separate real-kernel verification runbook.
+
+**Kubernetes Multi-Tenant Platform.** [`kubernetes-multi-tenant-platform/`](kubernetes-multi-tenant-platform/) generates tenant namespaces from one configuration and applies restricted Pod Security, quotas, namespace RBAC, token-hardening and default-deny network policy. CI verifies tenant RBAC isolation and privileged-workload rejection in a disposable kind cluster.
+
+**AWS Zero-Trust CI Identity.** [`aws-zero-trust-identity/`](aws-zero-trust-identity/) replaces long-lived CI credentials with GitHub OIDC and short-lived AWS STS sessions. Terraform constrains repository, branch, audience, session duration and permissions boundary, while CI regression-tests the identity contract without creating AWS resources.
+
 ## Engineering themes
 
 - infrastructure, delivery and operations as code;
@@ -104,9 +113,12 @@ Hands-on engineering portfolio covering secure delivery, Kubernetes, cloud infra
 - reproducible builds and verifiable software supply chains;
 - cloud platform design with private access and least privilege;
 - multi-account cloud governance with Organizations, OUs and SCP guardrails;
+- federated CI identity with OIDC and short-lived cloud credentials;
 - multi-cluster GitOps fleet placement, drift detection and convergence;
 - Kubernetes admission controls for validation, mutation and generated defaults;
+- namespace tenancy with quotas, RBAC, Pod Security and network isolation;
 - custom Kubernetes controllers with idempotent reconciliation, finalizers and status conditions;
+- eBPF runtime visibility and enforcement-policy review;
 - IAM permission-combination analysis and least-privilege regression tests;
 - risk-based vulnerability management using CVSS, EPSS, ownership and SLAs;
 - self-service developer portals, catalog ownership and secure golden paths;
