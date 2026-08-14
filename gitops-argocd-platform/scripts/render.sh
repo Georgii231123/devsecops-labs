@@ -10,7 +10,7 @@ esac
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 values="$root/environments/$env_name/values.yaml"
 
-if grep -Eq 'tag:[[:space:]]*["'"']?latest["'"']?[[:space:]]*$' "$values"; then
+if grep -Eq '^[[:space:]]*tag:.*latest' "$values"; then
   echo "refusing mutable latest image tag" >&2
   exit 1
 fi

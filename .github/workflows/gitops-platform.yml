@@ -30,7 +30,11 @@ jobs:
           docker run --rm -v "$PWD:/work" -w /work alpine/helm:3.17.3 template demo-prod charts/demo-service -f environments/prod/values.yaml > /tmp/prod.yaml
       - name: Reject mutable image tags
         run: |
-          ! grep -R -E 'tag:[[:space:]]*["'"']?latest["'"']?' environments
+          if grep -R -E '^[[:space:]]*tag:.*latest' environments; then
+            echo "mutable latest image tag is forbidden"
+            exit 1
+          fi
       - name: Trivy rendered Kubernetes manifests
         run: |
-          docker run --rm -v /tmp:/rendered aquasec/trivy:latest config --exit-code 0 /rendered
+          docker run --rm -v /tmp:/rendered aquasec/trivy:latest config --exit-code 0 /rendered/dev.yaml
+          docker run --rm -v /tmp:/rendered aquasec/trivy:latest config --exit-code 0 /rendered/prod.yaml

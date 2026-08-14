@@ -16,13 +16,16 @@ spec:
       name: "demo-service-{{env}}"
     spec:
       project: default
-      source:
-        repoURL: https://github.com/Georgii231123/devsecops-labs.git
-        targetRevision: main
-        path: gitops-argocd-platform/charts/demo-service
-        helm:
-          valueFiles:
-            - ../../environments/{{env}}/values.yaml
+      sources:
+        - repoURL: https://github.com/Georgii231123/devsecops-labs.git
+          targetRevision: main
+          path: gitops-argocd-platform/charts/demo-service
+          helm:
+            valueFiles:
+              - $values/gitops-argocd-platform/environments/{{env}}/values.yaml
+        - repoURL: https://github.com/Georgii231123/devsecops-labs.git
+          targetRevision: main
+          ref: values
       destination:
         server: https://kubernetes.default.svc
         namespace: "{{namespace}}"
