@@ -1,0 +1,20 @@
+groups:
+  - name: sre-game-day
+    rules:
+      - alert: ApplicationFailureMode
+        expr: app_failure_mode == 1
+        for: 3s
+        labels:
+          severity: page
+          service: incident-demo
+        annotations:
+          summary: Demo service entered injected failure mode
+          runbook: runbooks/high-error-rate.md
+      - alert: High5xxVolume
+        expr: increase(app_requests_total{status="5xx"}[15s]) > 5
+        for: 2s
+        labels:
+          severity: warning
+          service: incident-demo
+        annotations:
+          summary: Elevated 5xx request volume

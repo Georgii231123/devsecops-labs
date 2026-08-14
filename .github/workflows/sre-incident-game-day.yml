@@ -1,0 +1,59 @@
+name: SRE Incident Response Game Day
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "sre-incident-game-day/**"
+      - ".github/workflows/sre-incident-game-day.yml"
+  pull_request:
+    paths:
+      - "sre-incident-game-day/**"
+      - ".github/workflows/sre-incident-game-day.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  incident-drill:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: sre-incident-game-day
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Validate monitoring and runbook configuration
+        run: |
+          python -m pip install --disable-pip-version-check pyyaml==6.0.3
+          python scripts/validate.py
+          docker compose config >/dev/null
+
+      - name: Start incident lab
+        run: |
+          mkdir -p runtime artifacts
+          echo healthy > runtime/mode
+          docker compose up -d --build
+
+      - name: Execute detection and recovery game day
+        run: python scripts/game_day.py
+
+      - name: Upload incident evidence
+        uses: actions/upload-artifact@v7
+        with:
+          name: sre-game-day-evidence
+          path: sre-incident-game-day/artifacts/
+
+      - name: Diagnostics
+        if: failure()
+        run: docker compose logs
+
+      - name: Tear down
+        if: always()
+        run: docker compose down -v
