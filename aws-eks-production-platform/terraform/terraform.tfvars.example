@@ -1,0 +1,7 @@
+aws_region          = "eu-central-1"
+cluster_name        = "production-platform"
+kubernetes_version  = "1.34"
+environment         = "production"
+vpc_cidr            = "10.42.0.0/16"
+admin_principal_arn = "arn:aws:iam::123456789012:role/platform-admin"
+node_instance_types = ["m7i.large"]

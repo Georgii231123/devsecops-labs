@@ -1,0 +1,32 @@
+name: Istio Service Mesh Security
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'istio-service-mesh-security/**'
+      - '.github/workflows/istio-service-mesh.yml'
+  pull_request:
+    paths:
+      - 'istio-service-mesh-security/**'
+      - '.github/workflows/istio-service-mesh.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: istio-service-mesh-security
+    steps:
+      - uses: actions/checkout@v6
+      - name: Parse manifests and assert controls
+        run: |
+          python3 -m pip install --disable-pip-version-check pyyaml
+          python3 scripts/assert_security.py
+      - name: Istio static analysis
+        run: docker run --rm -v "$PWD:/work" istio/istioctl:1.30.3 analyze --use-kube=false -f /work/manifests
+      - name: Trivy Kubernetes review
+        run: docker run --rm -v "$PWD:/src" aquasec/trivy:latest config --exit-code 0 /src/manifests

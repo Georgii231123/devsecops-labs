@@ -1,0 +1,36 @@
+name: AWS EKS Production Platform
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'aws-eks-production-platform/**'
+      - '.github/workflows/aws-eks-production.yml'
+  pull_request:
+    paths:
+      - 'aws-eks-production-platform/**'
+      - '.github/workflows/aws-eks-production.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: aws-eks-production-platform
+    steps:
+      - uses: actions/checkout@v6
+      - name: Terraform formatting
+        run: docker run --rm -v "$PWD:/workspace" -w /workspace/terraform hashicorp/terraform:1.12.2 fmt -check -recursive
+      - name: Terraform init and validate
+        run: |
+          docker run --rm -v "$PWD:/workspace" -w /workspace/terraform hashicorp/terraform:1.12.2 init -backend=false
+          docker run --rm -v "$PWD:/workspace" -w /workspace/terraform hashicorp/terraform:1.12.2 validate
+      - name: Deterministic architecture gate
+        run: python3 scripts/security_gate.py
+      - name: Checkov review
+        run: docker run --rm -v "$PWD:/src" bridgecrew/checkov:latest -d /src/terraform --framework terraform --compact --soft-fail
+      - name: Trivy IaC review
+        run: docker run --rm -v "$PWD:/src" aquasec/trivy:latest config --exit-code 0 /src/terraform
