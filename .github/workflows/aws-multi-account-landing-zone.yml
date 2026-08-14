@@ -1,0 +1,40 @@
+name: AWS Multi-Account Landing Zone
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'aws-multi-account-landing-zone/**'
+      - '.github/workflows/aws-multi-account-landing-zone.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'aws-multi-account-landing-zone/**'
+      - '.github/workflows/aws-multi-account-landing-zone.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  terraform-contract:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: aws-multi-account-landing-zone
+    steps:
+      - uses: actions/checkout@v6
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.15.8
+          terraform_wrapper: false
+      - name: Terraform formatting
+        run: terraform fmt -check -recursive -diff
+      - name: Initialize providers
+        run: terraform init -backend=false -input=false
+      - name: Validate configuration
+        run: terraform validate
+      - name: Native Terraform regression tests
+        run: terraform test -no-color
+      - name: Security contract regression
+        run: python3 scripts/validate_contract.py
