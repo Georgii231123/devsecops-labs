@@ -122,5 +122,3 @@ Hands-on engineering portfolio covering secure delivery, Kubernetes, cloud infra
 - tested database backup restoration;
 - traffic health checks, retries and failover behavior;
 - secure runtime defaults and reduced privilege.
-
-Each project contains its own README and technical material suitable for a standalone interview walkthrough.
