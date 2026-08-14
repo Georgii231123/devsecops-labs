@@ -1,0 +1,46 @@
+name: AWS IAM Attack Defense Lab
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'aws-iam-attack-defense/**'
+      - '.github/workflows/aws-iam-attack-defense.yml'
+  pull_request:
+    paths:
+      - 'aws-iam-attack-defense/**'
+      - '.github/workflows/aws-iam-attack-defense.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  iam-defense-validation:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: aws-iam-attack-defense
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+          cache: pip
+          cache-dependency-path: aws-iam-attack-defense/requirements-dev.txt
+      - name: Install toolchain
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+      - name: Lint
+        run: ruff check .
+      - name: Unit tests
+        run: python -m pytest -q
+      - name: Static security review
+        run: bandit -r iam_risk.py scripts -q -ll
+      - name: Run attack-path detection lab
+        run: python scripts/run_lab.py
+      - name: Upload IAM risk evidence
+        uses: actions/upload-artifact@v7
+        with:
+          name: iam-risk-report
+          path: aws-iam-attack-defense/artifacts/
+          if-no-files-found: error
