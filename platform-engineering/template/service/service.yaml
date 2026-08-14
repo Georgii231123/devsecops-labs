@@ -1,0 +1,9 @@
+apiVersion: platform.example/v1
+kind: ServiceMetadata
+metadata:
+  name: __SERVICE_SLUG__
+spec:
+  displayName: __SERVICE_NAME__
+  owner: __OWNER__
+  lifecycle: production-ready-template
+  port: __PORT__

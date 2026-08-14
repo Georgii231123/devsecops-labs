@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: __SERVICE_SLUG__
+spec:
+  selector:
+    app.kubernetes.io/name: __SERVICE_SLUG__
+  ports:
+    - name: http
+      port: 80
+      targetPort: __PORT__
+  type: ClusterIP
