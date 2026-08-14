@@ -1,62 +1,68 @@
-# DevSecOps Labs
+# DevOps & DevSecOps Engineering Labs
 
-A small portfolio of practical DevSecOps labs focused on automated security controls, policy enforcement and CI/CD security gates.
+Hands-on portfolio covering secure delivery, Kubernetes, GitLab CI, cloud infrastructure, SRE/observability, platform engineering and Linux automation.
 
-## Labs
+## Projects
 
-### 1. Kubernetes Policy-as-Code Security Lab
+| # | Project | Direction | Main stack |
+|---|---|---|---|
+| 1 | Kubernetes Policy-as-Code Security Lab | Kubernetes / DevSecOps | Kubernetes, OPA, Conftest, Trivy, Checkov |
+| 2 | GitLab Secure Pipeline Lab | CI/CD / DevSecOps | GitLab CI, Docker, Ruff, Bandit, Gitleaks, Trivy, SBOM |
+| 3 | Cloud Platform on Terraform | Cloud / IaC | Terraform, AWS VPC, ECS, ECR, IAM, CloudWatch |
+| 4 | Observability & SRE Stack | SRE / Monitoring | Prometheus, Grafana, Alertmanager, SLO/SLI |
+| 5 | Platform Engineering Golden Path | Platform Engineering | service scaffolding, CI templates, Docker, Kubernetes |
+| 6 | Ansible Linux Platform Automation | Linux / Configuration Management | Ansible, Docker, Nginx, systemd, journald, UFW |
 
-The root of this repository contains a Kubernetes hardening lab with:
+### Kubernetes Policy-as-Code
 
-- vulnerable and hardened Kubernetes manifests;
-- OPA / Conftest policies;
-- Trivy and Checkov scanning;
-- NetworkPolicy and workload hardening;
-- GitHub Actions security gates.
+The repository root contains vulnerable and hardened Kubernetes workloads plus custom OPA/Conftest policy. The lab demonstrates policy gates, workload hardening, NetworkPolicy and IaC scanning.
 
-See [`docs/findings.md`](docs/findings.md), [`policy/`](policy/) and [`k8s/`](k8s/).
+Relevant paths: [`k8s/`](k8s/), [`policy/`](policy/), [`docs/findings.md`](docs/findings.md).
 
-### 2. GitLab Secure Pipeline Lab
+### GitLab Secure Pipeline
 
-[`gitlab-secure-pipeline/`](gitlab-secure-pipeline/) is a self-contained GitLab CI project that demonstrates:
+[`gitlab-secure-pipeline/`](gitlab-secure-pipeline/) demonstrates tests, linting, SAST, dependency auditing, secret detection, Trivy scanning, Dockerfile checks, CycloneDX SBOM generation and a deterministic safe-autofix patch flow.
 
-- linting and unit tests;
-- deterministic safe autofix with Ruff;
-- SAST with Bandit;
-- SCA with pip-audit;
-- secret scanning with Gitleaks;
-- repository and misconfiguration scanning with Trivy;
-- Dockerfile linting;
-- CycloneDX SBOM generation;
-- security gates that stop later stages when checks fail.
+### Cloud Platform on Terraform
 
-A GitHub Actions smoke workflow also validates the lab while it is hosted in this GitHub portfolio.
+[`cloud-platform-terraform/`](cloud-platform-terraform/) provides a reusable AWS baseline with a multi-AZ VPC, public/private subnets, optional NAT, ECR scanning, ECS Container Insights, CloudWatch logs and IAM. Cost-sensitive NAT creation is disabled by default.
 
----
+### Observability & SRE
 
-## Kubernetes Policy-as-Code Lab details
-
-The repository contains two versions of the same workload:
-
-- `k8s/vulnerable/` — intentionally insecure configuration;
-- `k8s/hardened/` — remediated configuration designed to satisfy the security policy.
-
-The custom policy rejects workloads that run privileged, allow privilege escalation, do not enforce non-root execution, use writable root filesystems, retain Linux capabilities, omit resource limits, use `latest`, enable host namespaces, mount `hostPath`, or omit seccomp.
-
-### Run locally
-
-Requirements: Docker and `make`.
+[`observability-sre/`](observability-sre/) contains an instrumented demo application, Prometheus, Grafana, Alertmanager, Node Exporter, recording rules, SLO/SLI definitions, alerts and incident runbooks.
 
 ```bash
-make policy
-make trivy
-make checkov
+cd observability-sre
+docker compose up --build -d
 ```
 
-To prove that the gate catches the insecure example:
+### Platform Engineering Golden Path
+
+[`platform-engineering/`](platform-engineering/) is an internal-developer-platform prototype. Its CLI generates a service with application code, tests, hardened Dockerfile, Kubernetes Deployment/Service/HPA, probes, ownership metadata and CI.
 
 ```bash
-make vulnerable
+cd platform-engineering
+python bootstrap.py payments-api --owner payments-team --output ./generated
+python scripts/validate_service.py generated/payments-api
 ```
 
-That command is expected to fail with policy violations.
+### Ansible Linux Platform Automation
+
+[`ansible-linux-platform/`](ansible-linux-platform/) configures an Ubuntu application host using reusable roles for OS baseline, Docker, Nginx and application lifecycle. SSH/firewall changes are feature-gated and the documented workflow starts with check mode.
+
+```bash
+cd ansible-linux-platform
+ansible-playbook -i inventories/dev/hosts.yml site.yml --check --diff
+```
+
+## Engineering themes
+
+- infrastructure and configuration as code;
+- CI/CD gates and reproducible automation;
+- secure runtime defaults and least privilege;
+- cloud cost-awareness and review before apply;
+- SLO-driven observability and incident runbooks;
+- self-service platform engineering;
+- Linux host automation and repeatable operations.
+
+Each project contains its own README and architecture/operations notes suitable for a technical interview walkthrough.
