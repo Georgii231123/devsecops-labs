@@ -1,0 +1,5 @@
+ALTER TABLE accounts
+    ADD COLUMN IF NOT EXISTS status text NOT NULL DEFAULT 'active'
+    CHECK (status IN ('active', 'disabled'));
+
+CREATE INDEX IF NOT EXISTS idx_accounts_status ON accounts(status);

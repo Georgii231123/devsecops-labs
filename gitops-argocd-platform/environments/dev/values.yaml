@@ -1,0 +1,14 @@
+replicaCount: 1
+image:
+  repository: ghcr.io/example/demo-service
+  tag: "dev-7f19d3a"
+autoscaling:
+  minReplicas: 1
+  maxReplicas: 3
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 250m
+    memory: 128Mi

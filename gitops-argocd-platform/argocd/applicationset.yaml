@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: demo-service-environments
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - env: dev
+            namespace: demo-dev
+          - env: prod
+            namespace: demo-prod
+  template:
+    metadata:
+      name: "demo-service-{{env}}"
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/Georgii231123/devsecops-labs.git
+        targetRevision: main
+        path: gitops-argocd-platform/charts/demo-service
+        helm:
+          valueFiles:
+            - ../../environments/{{env}}/values.yaml
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "{{namespace}}"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

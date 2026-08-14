@@ -1,0 +1,49 @@
+name: PostgreSQL Reliability Lab
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'database-reliability/**'
+      - '.github/workflows/database-reliability.yml'
+  pull_request:
+    paths:
+      - 'database-reliability/**'
+      - '.github/workflows/database-reliability.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  restore-drill:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: database-reliability
+    steps:
+      - uses: actions/checkout@v6
+      - name: Validate Compose
+        run: docker compose config -q
+      - name: Start PostgreSQL
+        run: |
+          docker compose up -d postgres
+          for i in $(seq 1 30); do
+            if docker compose exec -T postgres pg_isready -U appuser -d appdb; then exit 0; fi
+            sleep 2
+          done
+          docker compose logs postgres
+          exit 1
+      - name: Apply migrations and create sample data
+        run: |
+          ./scripts/migrate.sh
+          docker compose exec -T postgres psql -U appuser -d appdb -c "INSERT INTO accounts(username) VALUES ('restore-test');"
+      - name: Backup, mutate, restore and verify
+        run: |
+          ./scripts/backup.sh
+          docker compose exec -T postgres psql -U appuser -d appdb -c "DELETE FROM accounts;"
+          ./scripts/verify_latest_backup.sh
+          count=$(docker compose exec -T postgres psql -U appuser -d appdb -Atc "SELECT count(*) FROM accounts WHERE username='restore-test';")
+          test "$count" = "1"
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs --no-color postgres
