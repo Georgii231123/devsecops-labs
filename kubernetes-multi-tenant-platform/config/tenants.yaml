@@ -1,0 +1,15 @@
+tenants:
+  - name: payments
+    developer_group: tenant:payments:developers
+    quota:
+      cpu: "4"
+      memory: 8Gi
+      pods: "20"
+      persistentvolumeclaims: "5"
+  - name: analytics
+    developer_group: tenant:analytics:developers
+    quota:
+      cpu: "8"
+      memory: 16Gi
+      pods: "30"
+      persistentvolumeclaims: "10"
