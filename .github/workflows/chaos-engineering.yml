@@ -1,0 +1,45 @@
+name: Chaos Engineering Reliability Lab
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'chaos-engineering/**'
+      - '.github/workflows/chaos-engineering.yml'
+  pull_request:
+    paths:
+      - 'chaos-engineering/**'
+      - '.github/workflows/chaos-engineering.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  latency-and-recovery-drill:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: chaos-engineering
+    steps:
+      - uses: actions/checkout@v6
+      - name: Static validation
+        run: |
+          python3 -m compileall app scripts
+          docker compose config >/dev/null
+      - name: Start experiment stack
+        run: docker compose up --build -d
+      - name: Inject fault and verify recovery
+        run: python3 scripts/chaos_drill.py
+      - name: Upload experiment report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: chaos-experiment-report
+          path: chaos-engineering/artifacts/chaos-report.json
+          if-no-files-found: ignore
+      - name: Diagnostics
+        if: failure()
+        run: docker compose logs
+      - name: Tear down
+        if: always()
+        run: docker compose down -v

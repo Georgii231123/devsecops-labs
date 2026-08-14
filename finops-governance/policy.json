@@ -1,0 +1,10 @@
+{
+  "currency": "EUR",
+  "forecast_multiplier": 1.10,
+  "max_hpa_replicas": 10,
+  "required_labels": ["team", "cost-center", "environment"],
+  "team_budgets": {
+    "platform": 1000.0,
+    "engineering": 1600.0
+  }
+}

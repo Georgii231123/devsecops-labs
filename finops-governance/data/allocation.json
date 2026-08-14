@@ -1,0 +1,9 @@
+{
+  "period": "sample-month",
+  "records": [
+    {"team": "platform", "namespace": "platform-system", "cost": 420.0},
+    {"team": "platform", "namespace": "observability", "cost": 310.0},
+    {"team": "engineering", "namespace": "checkout", "cost": 680.0},
+    {"team": "engineering", "namespace": "catalog", "cost": 520.0}
+  ]
+}
