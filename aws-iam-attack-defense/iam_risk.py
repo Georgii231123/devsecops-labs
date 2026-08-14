@@ -120,7 +120,10 @@ def analyze(policy: dict[str, Any]) -> list[Finding]:
                 70,
                 "Access-key creation is not identity-scoped",
                 ("iam:CreateAccessKey", "Resource=*"),
-                "Allow access-key lifecycle only for an explicitly approved identity when unavoidable.",
+                (
+                    "Allow access-key lifecycle only for an explicitly approved "
+                    "identity when unavoidable."
+                ),
             )
         )
 
