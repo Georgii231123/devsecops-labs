@@ -1,0 +1,36 @@
+name: Edge Load Balancing Lab
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'edge-load-balancing/**'
+      - '.github/workflows/edge-load-balancing.yml'
+  pull_request:
+    paths:
+      - 'edge-load-balancing/**'
+      - '.github/workflows/edge-load-balancing.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  failure-drill:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: edge-load-balancing
+    steps:
+      - uses: actions/checkout@v6
+      - name: Validate definitions
+        run: |
+          docker compose config >/dev/null
+          python3 -m compileall backend
+          bash -n scripts/failure_drill.sh
+      - name: Start edge stack
+        run: docker compose up --build -d
+      - name: Kill one backend and verify failover
+        run: ./scripts/failure_drill.sh
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs

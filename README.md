@@ -1,6 +1,6 @@
 # DevOps & DevSecOps Engineering Labs
 
-Hands-on engineering portfolio covering secure delivery, Kubernetes, cloud infrastructure, SRE, platform engineering, Linux automation, GitOps and database reliability.
+Hands-on engineering portfolio covering secure delivery, Kubernetes, cloud infrastructure, SRE, platform engineering, Linux automation, GitOps, database reliability, secrets management, messaging, distributed tracing and traffic engineering.
 
 ## Portfolio map
 
@@ -14,67 +14,56 @@ Hands-on engineering portfolio covering secure delivery, Kubernetes, cloud infra
 | 6 | Ansible Linux Platform Automation | Linux / Configuration Management | Ansible, Docker, Nginx, systemd, journald, UFW |
 | 7 | GitOps Delivery Platform | GitOps / Kubernetes Delivery | Argo CD, ApplicationSet, Helm, HPA, NetworkPolicy |
 | 8 | PostgreSQL Database Reliability Lab | Database Operations / Reliability | PostgreSQL, migrations, pg_dump/pg_restore, Prometheus |
+| 9 | Jenkins CI/CD Platform | CI/CD Platform | Jenkins, JCasC, Shared Library, Trivy, Syft |
+| 10 | Vault Secrets Platform | Secrets Management | HashiCorp Vault, HCL policies, Kubernetes auth |
+| 11 | Messaging Reliability Lab | Messaging / Reliability | RabbitMQ, quorum queues, DLQ, Prometheus |
+| 12 | OpenTelemetry Distributed Tracing | Observability / Tracing | OpenTelemetry, OTLP, Jaeger, Flask |
+| 13 | Kubernetes Production Operations | Kubernetes / SRE | Kustomize, PDB, HPA, ResourceQuota, NetworkPolicy |
+| 14 | Nginx & HAProxy Load Balancing | Traffic Engineering | Nginx, HAProxy, health checks, failover |
 
-## 1. Kubernetes Policy-as-Code
+## Project guide
 
-The repository root contains vulnerable and hardened Kubernetes workloads plus custom OPA/Conftest policy. The lab demonstrates policy gates, workload hardening, NetworkPolicy and IaC scanning.
+**Kubernetes Policy-as-Code.** The repository root contains vulnerable and hardened Kubernetes workloads plus custom OPA/Conftest policy, policy gates, workload hardening and IaC scanning. Relevant paths: [`k8s/`](k8s/), [`policy/`](policy/), [`docs/findings.md`](docs/findings.md).
 
-Relevant paths: [`k8s/`](k8s/), [`policy/`](policy/), [`docs/findings.md`](docs/findings.md).
+**GitLab Secure Pipeline.** [`gitlab-secure-pipeline/`](gitlab-secure-pipeline/) demonstrates tests, linting, SAST, dependency auditing, secret detection, Trivy scanning, Dockerfile checks, CycloneDX SBOM generation and deterministic safe-autofix.
 
-## 2. GitLab Secure Pipeline
+**Cloud Platform on Terraform.** [`cloud-platform-terraform/`](cloud-platform-terraform/) provides a reusable AWS baseline with a multi-AZ VPC, public/private subnets, optional NAT, ECR scanning, ECS Container Insights, CloudWatch logs and IAM.
 
-[`gitlab-secure-pipeline/`](gitlab-secure-pipeline/) demonstrates tests, linting, SAST, dependency auditing, secret detection, Trivy scanning, Dockerfile checks, CycloneDX SBOM generation and a deterministic safe-autofix patch flow.
+**Observability & SRE.** [`observability-sre/`](observability-sre/) contains an instrumented service, Prometheus, Grafana, Alertmanager, Node Exporter, recording rules, SLO/SLI definitions, alerts and incident runbooks.
 
-## 3. Cloud Platform on Terraform
+**Platform Engineering Golden Path.** [`platform-engineering/`](platform-engineering/) is an internal-developer-platform prototype whose CLI generates a service with tests, hardened Dockerfile, Kubernetes resources, probes, ownership metadata and CI.
 
-[`cloud-platform-terraform/`](cloud-platform-terraform/) provides a reusable AWS baseline with a multi-AZ VPC, public/private subnets, optional NAT, ECR scanning, ECS Container Insights, CloudWatch logs and IAM. Cost-sensitive NAT creation is disabled by default.
+**Ansible Linux Platform.** [`ansible-linux-platform/`](ansible-linux-platform/) configures Ubuntu application hosts using reusable roles for OS baseline, Docker, Nginx and application lifecycle.
 
-## 4. Observability & SRE
+**GitOps Delivery Platform.** [`gitops-argocd-platform/`](gitops-argocd-platform/) packages a service as a Helm chart and models dev/prod delivery through Argo CD ApplicationSet, immutable promotion and Git rollback.
 
-[`observability-sre/`](observability-sre/) contains an instrumented demo application, Prometheus, Grafana, Alertmanager, Node Exporter, recording rules, SLO/SLI definitions, alerts and incident runbooks.
+**PostgreSQL Database Reliability.** [`database-reliability/`](database-reliability/) covers migrations, logical backups, restore verification, PostgreSQL metrics and recovery objectives. CI performs a real backup/mutate/restore drill.
 
-```bash
-cd observability-sre
-docker compose up --build -d
-```
+**Jenkins CI/CD Platform.** [`jenkins-cicd-platform/`](jenkins-cicd-platform/) models a controller configured by JCasC with a reusable Shared Library, immutable artifact flow, SBOM/security stages and production approval.
 
-## 5. Platform Engineering Golden Path
+**Vault Secrets Platform.** [`vault-secrets-platform/`](vault-secrets-platform/) demonstrates KV v2, least-privilege HCL policies, Kubernetes auth role design and a real CI secret read/write smoke test.
 
-[`platform-engineering/`](platform-engineering/) is an internal-developer-platform prototype. Its CLI generates a service with application code, tests, hardened Dockerfile, Kubernetes Deployment/Service/HPA, probes, ownership metadata and CI.
+**Messaging Reliability.** [`messaging-reliability/`](messaging-reliability/) demonstrates RabbitMQ quorum queues, DLQ routing, a three-node cluster topology and an automated reject/dead-letter verification drill.
 
-```bash
-cd platform-engineering
-python bootstrap.py payments-api --owner payments-team --output ./generated
-python scripts/validate_service.py generated/payments-api
-```
+**OpenTelemetry Distributed Tracing.** [`opentelemetry-tracing/`](opentelemetry-tracing/) traces a frontend-to-backend request through OTel Collector into Jaeger and verifies both services through the Jaeger API.
 
-## 6. Ansible Linux Platform Automation
+**Kubernetes Production Operations.** [`kubernetes-production-ops/`](kubernetes-production-ops/) demonstrates PDB, HPA, topology spread, quotas, probes, hardened securityContext, NetworkPolicy and rollout/node-drain runbooks.
 
-[`ansible-linux-platform/`](ansible-linux-platform/) configures an Ubuntu application host using reusable roles for OS baseline, Docker, Nginx and application lifecycle. SSH/firewall changes are feature-gated and the documented workflow starts with check mode.
-
-```bash
-cd ansible-linux-platform
-ansible-playbook -i inventories/dev/hosts.yml site.yml --check --diff
-```
-
-## 7. GitOps Delivery Platform
-
-[`gitops-argocd-platform/`](gitops-argocd-platform/) packages a service as a Helm chart and models dev/prod delivery through an Argo CD ApplicationSet. CI renders both environments, rejects mutable `latest` tags and scans the desired Kubernetes state. Promotion and rollback are Git changes rather than undocumented cluster commands.
-
-## 8. PostgreSQL Database Reliability
-
-[`database-reliability/`](database-reliability/) covers versioned SQL migrations, logical backups, restore verification, PostgreSQL metrics, recovery objectives and operations runbooks. CI performs a real backup/mutate/restore drill and verifies that expected data returns.
+**Nginx & HAProxy Load Balancing.** [`edge-load-balancing/`](edge-load-balancing/) compares two proxy approaches and runs an automated backend-failure drill to verify continued traffic through the surviving node.
 
 ## Engineering themes
 
-- infrastructure and configuration as code;
-- CI/CD gates and reproducible automation;
-- secure runtime defaults and least privilege;
-- cloud cost-awareness and review before apply;
-- SLO-driven observability and incident runbooks;
+- infrastructure, delivery and operations as code;
+- CI/CD quality and security gates;
+- immutable artifacts and Git-based promotion;
+- cloud cost awareness and review-before-apply;
+- SLO-driven observability, metrics and distributed tracing;
 - self-service platform engineering;
-- Linux host automation and repeatable operations;
-- declarative GitOps delivery and immutable promotion;
-- tested database recovery instead of unverified backups.
+- Linux and Kubernetes operations with explicit runbooks;
+- least-privilege secrets management instead of credentials in source;
+- messaging correctness, dead-letter handling and recovery drills;
+- tested database backup restoration;
+- traffic health checks, retries and failover behavior;
+- secure runtime defaults and reduced privilege.
 
-Each project contains its own README and architecture/operations notes suitable for a technical interview walkthrough.
+Each project contains its own README and technical material suitable for a standalone interview walkthrough.

@@ -1,0 +1,30 @@
+name: Kubernetes Production Operations
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'kubernetes-production-ops/**'
+      - '.github/workflows/kubernetes-production-ops.yml'
+  pull_request:
+    paths:
+      - 'kubernetes-production-ops/**'
+      - '.github/workflows/kubernetes-production-ops.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  render-and-scan:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: kubernetes-production-ops
+    steps:
+      - uses: actions/checkout@v6
+      - name: Render production overlay
+        run: docker run --rm -v "$PWD:/work" -w /work registry.k8s.io/kubectl:v1.31.6 kustomize overlays/prod > /tmp/prod.yaml
+      - name: Validate operational controls
+        run: python3 scripts/validate.py
+      - name: Scan manifests
+        run: docker run --rm -v /tmp:/rendered aquasec/trivy:latest config --exit-code 0 /rendered/prod.yaml
