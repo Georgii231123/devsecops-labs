@@ -11,7 +11,7 @@ class NetworkPolicy:
         self.default = default
 
     @classmethod
-    def from_file(cls, path: str | Path) -> "NetworkPolicy":
+    def from_file(cls, path: str | Path) -> NetworkPolicy:
         data = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
         return cls(data.get("rules", []), data.get("default", "deny"))
 

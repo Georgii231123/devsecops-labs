@@ -22,7 +22,7 @@ class DetectionEngine:
         self.config = config
 
     @classmethod
-    def from_file(cls, path: str | Path) -> "DetectionEngine":
+    def from_file(cls, path: str | Path) -> DetectionEngine:
         return cls(yaml.safe_load(Path(path).read_text(encoding="utf-8")))
 
     def analyze(self, event: dict[str, object]) -> list[Alert]:

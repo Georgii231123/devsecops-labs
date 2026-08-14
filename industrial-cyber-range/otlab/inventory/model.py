@@ -12,7 +12,7 @@ class AssetInventory:
         self.assets = assets
 
     @classmethod
-    def from_file(cls, path: str | Path) -> "AssetInventory":
+    def from_file(cls, path: str | Path) -> AssetInventory:
         data = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
         return cls(data.get("assets", []))
 
