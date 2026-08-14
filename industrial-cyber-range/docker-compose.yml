@@ -48,7 +48,7 @@ services:
       - ot_supervisory
 
   mqtt:
-    image: eclipse-mosquitto:2.1.2
+    image: eclipse-mosquitto:2.1.2-alpine
     command: mosquitto -c /mosquitto-no-auth.conf
     volumes:
       - ./mqtt/mosquitto.conf:/mosquitto-no-auth.conf:ro
