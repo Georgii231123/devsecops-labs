@@ -1,6 +1,6 @@
 # DevOps & DevSecOps Engineering Labs
 
-Hands-on engineering portfolio covering secure delivery, Kubernetes, cloud infrastructure, SRE, platform engineering, Linux automation, GitOps, database reliability, secrets management, messaging, distributed tracing, traffic engineering, service mesh, chaos engineering, FinOps, reusable CI platforms, multi-cluster operations, software supply-chain security and incident response.
+Hands-on engineering portfolio covering secure delivery, Kubernetes, cloud infrastructure, SRE, platform engineering, Linux automation, GitOps, database reliability, secrets management, messaging, distributed tracing, traffic engineering, service mesh, chaos engineering, FinOps, reusable CI platforms, multi-cluster operations, software supply-chain security, incident response, admission control, IAM security and vulnerability management.
 
 ## Portfolio map
 
@@ -29,6 +29,9 @@ Hands-on engineering portfolio covering secure delivery, Kubernetes, cloud infra
 | 21 | Multi-Cluster GitOps Platform | Multi-Cluster GitOps / Platform | Argo CD, ApplicationSet, Kustomize, kind, drift reconciliation |
 | 22 | Software Supply Chain Security | Supply Chain Security / DevSecOps | Cosign, Syft, GitHub attestations, reproducible builds, CycloneDX |
 | 23 | SRE Incident Response Game Day | Incident Response / SRE | Prometheus, Docker Compose, paging alerts, runbooks, MTTA/MTTR |
+| 24 | Kubernetes Admission Control | Admission Policy / DevSecOps | Kyverno, validation, mutation, generation, policy regression |
+| 25 | AWS IAM Attack & Defense Lab | Cloud IAM / Security Engineering | IAM JSON, privilege-escalation detection, pytest, Bandit |
+| 26 | Vulnerability Management Platform | Vulnerability Management / SOC to DevSecOps | Trivy, CVSS, EPSS, SLA routing, DefectDojo API |
 
 ## Project guide
 
@@ -78,6 +81,12 @@ Hands-on engineering portfolio covering secure delivery, Kubernetes, cloud infra
 
 **SRE Incident Response Game Day.** [`sre-incident-game-day/`](sre-incident-game-day/) injects a controlled 5xx incident, waits for a real Prometheus paging alert, executes runbook remediation and generates MTTA/MTTR timeline and postmortem evidence.
 
+**Kubernetes Admission Control.** [`kyverno-admission-control/`](kyverno-admission-control/) turns runtime requirements into Kyverno admission controls. CI proves a hardened workload is admitted, vulnerable fixtures are rejected, seccomp mutation is applied and a default-deny NetworkPolicy can be generated.
+
+**AWS IAM Attack & Defense.** [`aws-iam-attack-defense/`](aws-iam-attack-defense/) models IAM privilege-escalation combinations offline, produces explainable findings and risk evidence, and regression-tests a least-privilege deployer policy to prevent critical false positives.
+
+**Vulnerability Management Platform.** [`vulnerability-management-platform/`](vulnerability-management-platform/) ingests Trivy JSON, combines CVSS and EPSS, assigns remediation SLAs and owners, proves an overdue high-risk gate can block CI, and includes a DefectDojo import client.
+
 ## Engineering themes
 
 - infrastructure, delivery and operations as code;
@@ -86,6 +95,9 @@ Hands-on engineering portfolio covering secure delivery, Kubernetes, cloud infra
 - reproducible builds and verifiable software supply chains;
 - cloud platform design with private access and least privilege;
 - multi-cluster GitOps fleet placement, drift detection and convergence;
+- Kubernetes admission controls for validation, mutation and generated defaults;
+- IAM permission-combination analysis and least-privilege regression tests;
+- risk-based vulnerability management using CVSS, EPSS, ownership and SLAs;
 - zero-trust east-west traffic with workload identity;
 - SLO-driven observability across metrics, logs and traces;
 - executable incident-response runbooks with MTTA/MTTR evidence;
