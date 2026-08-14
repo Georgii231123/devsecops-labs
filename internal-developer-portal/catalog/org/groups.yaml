@@ -1,0 +1,22 @@
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: platform
+  description: Internal developer platform team
+spec:
+  type: team
+  profile:
+    displayName: Platform Engineering
+  children: []
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: payments
+  description: Payments product engineering team
+spec:
+  type: team
+  profile:
+    displayName: Payments Engineering
+  parent: platform
+  children: []

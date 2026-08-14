@@ -1,0 +1,8 @@
+component:
+  requiredSpecFields: [type, lifecycle, owner, system]
+  requiredAnnotations:
+    - backstage.io/techdocs-ref
+    - github.com/project-slug
+  allowedLifecycle: [experimental, production, deprecated]
+template:
+  requiredActions: [fetch:template, publish:github, catalog:register]

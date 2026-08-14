@@ -1,0 +1,31 @@
+app:
+  title: Engineering Portal
+  baseUrl: http://localhost:3000
+organization:
+  name: Example Engineering
+backend:
+  baseUrl: http://localhost:7007
+  listen:
+    port: 7007
+catalog:
+  rules:
+    - allow: [Component, System, Domain, API, Resource, Group, User, Template]
+  locations:
+    - type: file
+      target: ./catalog/org/groups.yaml
+    - type: file
+      target: ./catalog/platform/domain-system.yaml
+    - type: file
+      target: ./catalog/payments/catalog.yaml
+    - type: file
+      target: ./templates/python-service/template.yaml
+techdocs:
+  builder: local
+  generator:
+    runIn: local
+  publisher:
+    type: local
+scaffolder:
+  defaultAuthor:
+    name: Platform Engineering
+    email: platform@example.invalid

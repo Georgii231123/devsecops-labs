@@ -1,0 +1,16 @@
+apiVersion: backstage.io/v1alpha1
+kind: Domain
+metadata:
+  name: commerce
+  description: Commerce business domain
+spec:
+  owner: group:platform
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: payments
+  description: Payment processing system
+spec:
+  owner: group:payments
+  domain: commerce

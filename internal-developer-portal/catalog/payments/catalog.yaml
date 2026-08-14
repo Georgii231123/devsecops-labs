@@ -1,0 +1,48 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: payments-api
+  description: Public payment authorization API
+  annotations:
+    backstage.io/techdocs-ref: dir:../../
+    github.com/project-slug: Georgii231123/devsecops-labs
+  tags: [python, api, critical]
+spec:
+  type: service
+  lifecycle: production
+  owner: group:payments
+  system: payments
+  providesApis: [payments-api]
+  dependsOn: [resource:default/payments-db]
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: payments-api
+  description: Payment authorization contract
+spec:
+  type: openapi
+  lifecycle: production
+  owner: group:payments
+  system: payments
+  definition: |
+    openapi: 3.0.3
+    info:
+      title: Payments API
+      version: 1.0.0
+    paths:
+      /healthz:
+        get:
+          responses:
+            '200':
+              description: healthy
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: payments-db
+  description: PostgreSQL data store owned by the payments team
+spec:
+  type: database
+  owner: group:payments
+  system: payments

@@ -1,0 +1,17 @@
+name: production-service-baseline
+checks:
+  - id: owner
+    description: Component has an owning group
+    required: true
+  - id: system
+    description: Component belongs to a system
+    required: true
+  - id: techdocs
+    description: TechDocs source is declared
+    required: true
+  - id: repository
+    description: Source repository annotation is declared
+    required: true
+  - id: api-contract
+    description: Public API is represented in the catalog
+    required: true

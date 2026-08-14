@@ -1,0 +1,40 @@
+name: Internal Developer Portal
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'internal-developer-portal/**'
+      - '.github/workflows/internal-developer-portal.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'internal-developer-portal/**'
+      - '.github/workflows/internal-developer-portal.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  portal-contract:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: internal-developer-portal
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+          cache: pip
+          cache-dependency-path: internal-developer-portal/requirements-dev.txt
+      - run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+      - name: Lint validator
+        run: ruff check scripts tests
+      - name: Portal contract regression tests
+        run: python -m pytest -q
+      - name: Validate catalog and golden path
+        run: python scripts/validate_portal.py
+      - name: Compile generated service source
+        run: python -m compileall -q templates/python-service/skeleton/src
