@@ -30,5 +30,6 @@
   {"id": 29, "name": "AWS Multi-Account Landing Zone", "path": "aws-multi-account-landing-zone", "workflow": ".github/workflows/aws-multi-account-landing-zone.yml", "area": "Cloud Governance / Platform Security"},
   {"id": 30, "name": "eBPF Runtime Security", "path": "ebpf-runtime-security", "workflow": ".github/workflows/ebpf-runtime-security.yml", "area": "Runtime Security / eBPF"},
   {"id": 31, "name": "Kubernetes Multi-Tenant Platform", "path": "kubernetes-multi-tenant-platform", "workflow": ".github/workflows/kubernetes-multi-tenant-platform.yml", "area": "Kubernetes Platform / Isolation"},
-  {"id": 32, "name": "AWS Zero-Trust CI Identity", "path": "aws-zero-trust-identity", "workflow": ".github/workflows/aws-zero-trust-identity.yml", "area": "Cloud Identity / Zero Trust"}
+  {"id": 32, "name": "AWS Zero-Trust CI Identity", "path": "aws-zero-trust-identity", "workflow": ".github/workflows/aws-zero-trust-identity.yml", "area": "Cloud Identity / Zero Trust"},
+  {"id": 33, "name": "Industrial Cyber Range", "path": "industrial-cyber-range", "workflow": ".github/workflows/industrial-cyber-range.yml", "area": "OT / ICS Security Engineering"}
 ]

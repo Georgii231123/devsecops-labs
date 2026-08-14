@@ -2,7 +2,7 @@
 
 [![Repository Quality](https://github.com/Georgii231123/devsecops-labs/actions/workflows/repository-quality.yml/badge.svg)](https://github.com/Georgii231123/devsecops-labs/actions/workflows/repository-quality.yml)
 
-Infrastructure, delivery, reliability and security projects collected in one repository. The labs cover Kubernetes, cloud/IaC, CI/CD, platform engineering, SRE, Linux automation, identity and security engineering. Most projects have an executable CI check rather than only static configuration.
+Infrastructure, delivery, reliability and security projects collected in one repository. The labs cover Kubernetes, cloud/IaC, CI/CD, platform engineering, SRE, Linux automation, identity, application security and industrial security engineering. Most projects have an executable CI check rather than only static configuration.
 
 Cloud projects are safe by default: CI validates plans, policies and mocked contracts instead of applying paid infrastructure unless a project README explicitly says otherwise. Intentionally vulnerable examples are isolated and exist to prove that a corresponding control rejects them.
 
@@ -42,6 +42,7 @@ Cloud projects are safe by default: CI validates plans, policies and mocked cont
 | 30 | [eBPF Runtime Security](ebpf-runtime-security/) | Runtime Security / eBPF | Tetragon, TracingPolicy, LSM hooks, runtime event triage |
 | 31 | [Kubernetes Multi-Tenant Platform](kubernetes-multi-tenant-platform/) | Kubernetes Platform / Isolation | kind, RBAC, Pod Security, ResourceQuota, NetworkPolicy |
 | 32 | [AWS Zero-Trust CI Identity](aws-zero-trust-identity/) | Cloud Identity / Zero Trust | GitHub OIDC, STS, IAM, Terraform, permissions boundaries |
+| 33 | [Industrial Cyber Range](industrial-cyber-range/) | OT / ICS Security Engineering | PLC simulator, Modbus/TCP, OPC UA, MQTT, SCADA, Prometheus |
 
 A category-oriented overview is in [`docs/projects.md`](docs/projects.md). The machine-readable project/workflow map is kept in [`docs/project-catalog.json`](docs/project-catalog.json).
 
@@ -49,7 +50,7 @@ A category-oriented overview is in [`docs/projects.md`](docs/projects.md). The m
 
 The repository has a top-level quality gate in addition to project-specific workflows. It checks:
 
-- the 32-project catalog, project paths, READMEs and primary workflows;
+- the 33-project catalog, project paths, READMEs and primary workflows;
 - JSON, TOML and non-templated YAML syntax;
 - local Markdown links in the root documentation;
 - explicit GitHub Actions permissions and forbidden `pull_request_target` usage;

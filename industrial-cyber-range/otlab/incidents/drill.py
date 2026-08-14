@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import asdict
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -71,5 +72,5 @@ def run_scenario(name: str) -> dict[str, object]:
         "alerts": alerts,
         "actions": actions,
         "process_state": controller.state.snapshot(),
-        "audit_events": [event.__dict__ for event in controller.audit],
+        "audit_events": [asdict(event) for event in controller.audit],
     }

@@ -48,3 +48,7 @@ The repository is split into independent labs. Each directory keeps its own runt
 - **Messaging Reliability Lab** — RabbitMQ quorum queues, DLQ routing and failure-flow verification.
 - **FinOps Governance Lab** — budget, allocation metadata and Kubernetes cost-control policy.
 - **Vulnerability Management Platform** — Trivy ingestion, CVSS/EPSS prioritization, SLA routing and DefectDojo-compatible import.
+
+## Industrial and OT security
+
+- **Industrial Cyber Range** — local pump/PLC process simulator with Modbus/TCP, OPC UA, MQTT, SCADA, asset inventory, segmentation policy, detections, safe-state logic and incident evidence.
