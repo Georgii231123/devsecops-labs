@@ -1,0 +1,23 @@
+name: Deploy with AWS OIDC
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - name: Exchange GitHub OIDC token for AWS STS credentials
+        uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c
+        with:
+          role-to-assume: arn:aws:iam::111111111111:role/github-oidc-deploy
+          role-session-name: gha-${{ github.run_id }}
+          aws-region: eu-central-1
+          unset-current-credentials: true
+      - name: Confirm short-lived identity
+        run: aws sts get-caller-identity

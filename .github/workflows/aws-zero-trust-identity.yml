@@ -1,0 +1,40 @@
+name: AWS Zero-Trust Identity
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'aws-zero-trust-identity/**'
+      - '.github/workflows/aws-zero-trust-identity.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'aws-zero-trust-identity/**'
+      - '.github/workflows/aws-zero-trust-identity.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  identity-contract:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: aws-zero-trust-identity
+    steps:
+      - uses: actions/checkout@v6
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.15.8
+          terraform_wrapper: false
+      - name: Terraform formatting
+        run: terraform fmt -check -recursive -diff
+      - name: Initialize provider
+        run: terraform init -backend=false -input=false
+      - name: Validate configuration
+        run: terraform validate
+      - name: Native Terraform regression tests
+        run: terraform test -no-color
+      - name: Zero-trust identity contract
+        run: python scripts/check_identity_contract.py
