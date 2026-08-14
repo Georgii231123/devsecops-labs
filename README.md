@@ -1,6 +1,6 @@
 # DevOps & DevSecOps Engineering Labs
 
-Hands-on engineering portfolio covering secure delivery, Kubernetes, cloud infrastructure, SRE, platform engineering, Linux automation, GitOps, database reliability, secrets management, messaging, distributed tracing, traffic engineering, service mesh, chaos engineering, FinOps, reusable CI platforms, multi-cluster operations, software supply-chain security, incident response, admission control, IAM security and vulnerability management.
+Hands-on engineering portfolio covering secure delivery, Kubernetes, cloud infrastructure, SRE, platform engineering, Linux automation, GitOps, database reliability, secrets management, messaging, distributed tracing, traffic engineering, service mesh, chaos engineering, FinOps, reusable CI platforms, multi-cluster operations, software supply-chain security, incident response, admission control, IAM security, vulnerability management, Kubernetes operators, internal developer portals and multi-account cloud governance.
 
 ## Portfolio map
 
@@ -32,6 +32,9 @@ Hands-on engineering portfolio covering secure delivery, Kubernetes, cloud infra
 | 24 | Kubernetes Admission Control | Admission Policy / DevSecOps | Kyverno, validation, mutation, generation, policy regression |
 | 25 | AWS IAM Attack & Defense Lab | Cloud IAM / Security Engineering | IAM JSON, privilege-escalation detection, pytest, Bandit |
 | 26 | Vulnerability Management Platform | Vulnerability Management / SOC to DevSecOps | Trivy, CVSS, EPSS, SLA routing, DefectDojo API |
+| 27 | Kubernetes Operator Platform | Kubernetes Controllers / Platform Engineering | Go, controller-runtime, CRD, envtest, RBAC |
+| 28 | Internal Developer Portal | Platform Engineering / Developer Experience | Backstage catalog, Scaffolder, TechDocs, golden path |
+| 29 | AWS Multi-Account Landing Zone | Cloud Governance / Platform Security | Terraform, AWS Organizations, SCP, CloudTrail, KMS, Config |
 
 ## Project guide
 
@@ -87,6 +90,12 @@ Hands-on engineering portfolio covering secure delivery, Kubernetes, cloud infra
 
 **Vulnerability Management Platform.** [`vulnerability-management-platform/`](vulnerability-management-platform/) ingests Trivy JSON, combines CVSS and EPSS, assigns remediation SLAs and owners, proves an overdue high-risk gate can block CI, and includes a DefectDojo import client.
 
+**Kubernetes Operator Platform.** [`kubernetes-operator-platform/`](kubernetes-operator-platform/) implements a Go controller for a `WebService` CRD. The reconcile loop converges Deployment, Service and metadata ConfigMap resources, uses owner references and a finalizer, writes readiness conditions, and generates hardened runtime defaults. CI includes an integration test against an ephemeral Kubernetes API server.
+
+**Internal Developer Portal.** [`internal-developer-portal/`](internal-developer-portal/) models a Backstage software catalog with ownership, domains, systems, components, APIs and resources. A self-service Python service template embeds repository registration, TechDocs metadata and hardened Kubernetes defaults, while CI detects broken catalog relationships and golden-path drift.
+
+**AWS Multi-Account Landing Zone.** [`aws-multi-account-landing-zone/`](aws-multi-account-landing-zone/) models AWS Organizations and OU hierarchy, SCP guardrails, guarded account vending, delegated security administration and a centralized KMS/S3/organization-CloudTrail audit path. Native Terraform tests use a mocked AWS provider, so the architecture can be regression-tested without creating cloud resources.
+
 ## Engineering themes
 
 - infrastructure, delivery and operations as code;
@@ -94,10 +103,13 @@ Hands-on engineering portfolio covering secure delivery, Kubernetes, cloud infra
 - immutable artifacts, SBOMs, signatures, attestations and Git-based promotion;
 - reproducible builds and verifiable software supply chains;
 - cloud platform design with private access and least privilege;
+- multi-account cloud governance with Organizations, OUs and SCP guardrails;
 - multi-cluster GitOps fleet placement, drift detection and convergence;
 - Kubernetes admission controls for validation, mutation and generated defaults;
+- custom Kubernetes controllers with idempotent reconciliation, finalizers and status conditions;
 - IAM permission-combination analysis and least-privilege regression tests;
 - risk-based vulnerability management using CVSS, EPSS, ownership and SLAs;
+- self-service developer portals, catalog ownership and secure golden paths;
 - zero-trust east-west traffic with workload identity;
 - SLO-driven observability across metrics, logs and traces;
 - executable incident-response runbooks with MTTA/MTTR evidence;
