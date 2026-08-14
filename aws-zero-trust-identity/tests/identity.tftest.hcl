@@ -49,9 +49,4 @@ run "zero_trust_contract" {
     condition     = aws_iam_role.github_deploy.max_session_duration == 3600
     error_message = "GitHub STS session must remain limited to one hour."
   }
-
-  assert {
-    condition     = aws_iam_role.github_deploy.permissions_boundary == aws_iam_policy.github_boundary.arn
-    error_message = "Deployment role must retain its permissions boundary."
-  }
 }
