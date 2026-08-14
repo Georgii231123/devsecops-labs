@@ -28,7 +28,7 @@ jobs:
           cache: pip
           cache-dependency-path: platform-engineering/requirements.txt
       - run: pip install -r requirements.txt
-      - run: pytest -q
+      - run: python -m pytest tests -q
       - name: Generate and validate example service
         run: |
           python bootstrap.py inventory-api --owner inventory-team --output /tmp/platform-generated
