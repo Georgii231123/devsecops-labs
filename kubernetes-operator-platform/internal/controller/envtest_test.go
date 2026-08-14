@@ -46,9 +46,6 @@ func TestEnvtestReconciliation(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	if err := c.Create(ctx, &corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: "default"}}); err != nil {
-		t.Fatal(err)
-	}
 	web := &platformv1alpha1.WebService{
 		ObjectMeta: metav1.ObjectMeta{Name: "catalog", Namespace: "default"},
 		Spec: platformv1alpha1.WebServiceSpec{
