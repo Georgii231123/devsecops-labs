@@ -1,0 +1,35 @@
+name: Ansible Linux Platform
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ansible-linux-platform/**'
+      - '.github/workflows/ansible-linux.yml'
+  pull_request:
+    paths:
+      - 'ansible-linux-platform/**'
+      - '.github/workflows/ansible-linux.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ansible-linux-platform
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - name: Install Ansible tooling
+        run: pip install ansible-core ansible-lint
+      - name: Install collections
+        run: ansible-galaxy collection install -r requirements.yml
+      - name: Syntax check
+        run: ansible-playbook -i inventories/dev/hosts.yml site.yml --syntax-check
+      - name: Ansible lint
+        run: ansible-lint site.yml roles/

@@ -1,0 +1,67 @@
+---
+- name: Install base packages
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - curl
+      - git
+      - jq
+      - htop
+      - chrony
+      - ufw
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Ensure chrony is enabled
+  ansible.builtin.service:
+    name: chrony
+    state: started
+    enabled: true
+
+- name: Configure journald retention
+  ansible.builtin.copy:
+    dest: /etc/systemd/journald.conf.d/99-platform.conf
+    content: |
+      [Journal]
+      SystemMaxUse={{ journald_max_use }}
+      MaxRetentionSec={{ journald_max_retention }}
+      Compress=yes
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart journald
+
+- name: Install SSH hardening drop-in
+  ansible.builtin.template:
+    src: 99-platform-hardening.conf.j2
+    dest: /etc/ssh/sshd_config.d/99-platform-hardening.conf
+    owner: root
+    group: root
+    mode: "0600"
+  when: ssh_hardening_enabled | bool
+  notify: Restart ssh
+
+- name: Allow SSH before enabling firewall
+  community.general.ufw:
+    rule: allow
+    port: "{{ ssh_port }}"
+    proto: tcp
+  when: firewall_enabled | bool
+
+- name: Set default incoming firewall policy
+  community.general.ufw:
+    direction: incoming
+    policy: deny
+  when: firewall_enabled | bool
+
+- name: Set default outgoing firewall policy
+  community.general.ufw:
+    direction: outgoing
+    policy: allow
+  when: firewall_enabled | bool
+
+- name: Enable firewall
+  community.general.ufw:
+    state: enabled
+  when: firewall_enabled | bool

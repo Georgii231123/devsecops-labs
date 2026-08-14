@@ -1,0 +1,32 @@
+---
+- name: Install Docker runtime packages
+  ansible.builtin.apt:
+    name:
+      - docker.io
+      - docker-compose-v2
+    state: present
+    update_cache: true
+
+- name: Ensure Docker is enabled
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Configure Docker daemon defaults
+  ansible.builtin.copy:
+    dest: /etc/docker/daemon.json
+    content: |
+      {
+        "log-driver": "json-file",
+        "log-opts": {
+          "max-size": "10m",
+          "max-file": "3"
+        },
+        "live-restore": true,
+        "no-new-privileges": true
+      }
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart docker

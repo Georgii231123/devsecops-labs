@@ -1,0 +1,15 @@
+---
+platform_admin_user: devops
+ssh_hardening_enabled: false
+firewall_enabled: false
+ssh_port: 22
+
+app_name: demo-web
+app_directory: /opt/demo-web
+app_image: nginx:1.28-alpine
+app_container_port: 80
+app_listen_port: 8080
+server_name: _
+
+journald_max_use: 500M
+journald_max_retention: 7day
