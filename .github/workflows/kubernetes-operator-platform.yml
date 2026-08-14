@@ -27,6 +27,7 @@ jobs:
       - uses: actions/setup-go@v6
         with:
           go-version: '1.26.x'
+          cache-dependency-path: kubernetes-operator-platform/go.sum
       - name: Resolve and verify dependencies
         run: go mod tidy && go mod verify
       - name: Formatting
@@ -44,4 +45,4 @@ jobs:
       - name: Envtest integration
         run: go test ./internal/controller -run TestEnvtestReconciliation -count=1 -v
       - name: Build operator
-        run: CGO_ENABLED=0 go build -trimpath ./cmd
+        run: CGO_ENABLED=0 go build -trimpath -o /tmp/webservice-operator ./cmd
