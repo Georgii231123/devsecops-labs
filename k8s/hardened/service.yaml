@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hardened-web
+  namespace: security-lab
+spec:
+  type: ClusterIP
+  selector:
+    app: hardened-web
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
