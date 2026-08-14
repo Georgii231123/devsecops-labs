@@ -1,6 +1,6 @@
 import base64
+import http.client
 import json
-import sys
 import time
 import urllib.error
 import urllib.request
@@ -23,13 +23,15 @@ def request(method, path, payload=None):
 
 
 def wait_ready():
-    for _ in range(40):
+    last_error = None
+    for _ in range(45):
         try:
             request("GET", "/overview")
             return
-        except (urllib.error.URLError, TimeoutError):
+        except (urllib.error.URLError, ConnectionError, TimeoutError, http.client.HTTPException) as exc:
+            last_error = exc
             time.sleep(2)
-    raise RuntimeError("RabbitMQ management API did not become ready")
+    raise RuntimeError(f"RabbitMQ management API did not become ready: {last_error}")
 
 
 wait_ready()
@@ -48,9 +50,13 @@ rejected = request("POST", "/queues/%2F/events.q/get", {"count": 1, "ackmode": "
 if not rejected:
     raise RuntimeError("source queue did not return the message")
 
-time.sleep(1)
-dead = request("POST", "/queues/%2F/events.dlq/get", {"count": 1, "ackmode": "ack_requeue_false", "encoding": "auto", "truncate": 50000})
-if not dead or '"id":42' not in dead[0].get("payload", ""):
+for _ in range(10):
+    dead = request("POST", "/queues/%2F/events.dlq/get", {"count": 1, "ackmode": "ack_requeue_false", "encoding": "auto", "truncate": 50000})
+    if dead:
+        if '"id":42' not in dead[0].get("payload", ""):
+            raise RuntimeError("unexpected dead-letter payload")
+        print("RabbitMQ quorum/DLQ smoke test passed")
+        break
+    time.sleep(1)
+else:
     raise RuntimeError("dead-letter message was not verified")
-
-print("RabbitMQ quorum/DLQ smoke test passed")

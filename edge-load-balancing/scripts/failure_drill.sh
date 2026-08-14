@@ -10,15 +10,27 @@ wait_url() {
   return 1
 }
 
+observe_both_backends() {
+  local port="$1"
+  local responses
+  for _ in {1..20}; do
+    responses=""
+    for _ in {1..16}; do
+      responses+="$(curl -fsS "http://localhost:${port}/" || true)"
+    done
+    if grep -q backend1 <<<"$responses" && grep -q backend2 <<<"$responses"; then
+      return 0
+    fi
+    sleep 1
+  done
+  echo "port ${port} did not observe both healthy backends" >&2
+  return 1
+}
+
 wait_url http://localhost:8080/
 wait_url http://localhost:8081/
-
-for port in 8080 8081; do
-  responses=""
-  for _ in {1..12}; do responses+="$(curl -fsS "http://localhost:${port}/")"; done
-  grep -q backend1 <<<"$responses"
-  grep -q backend2 <<<"$responses"
-done
+observe_both_backends 8080
+observe_both_backends 8081
 
 docker compose stop backend1
 sleep 6
