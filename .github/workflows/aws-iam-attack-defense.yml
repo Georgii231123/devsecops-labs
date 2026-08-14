@@ -37,7 +37,7 @@ jobs:
       - name: Static security review
         run: bandit -r iam_risk.py scripts -q -ll
       - name: Run attack-path detection lab
-        run: python scripts/run_lab.py
+        run: python -m scripts.run_lab
       - name: Upload IAM risk evidence
         uses: actions/upload-artifact@v7
         with:

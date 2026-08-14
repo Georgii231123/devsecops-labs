@@ -40,17 +40,21 @@ jobs:
           kyverno version
       - name: Prove safe workload is admitted
         run: |
-          kyverno apply policies/disallow-privileged.yaml --resource fixtures/good.yaml > /tmp/good-privileged.txt
-          kyverno apply policies/require-nonroot.yaml --resource fixtures/good.yaml > /tmp/good-nonroot.txt
-          kyverno apply policies/disallow-latest.yaml --resource fixtures/good.yaml > /tmp/good-tag.txt
-          kyverno apply policies/require-runtime-controls.yaml --resource fixtures/good.yaml > /tmp/good-runtime.txt
-          kyverno apply policies/disallow-hostpath.yaml --resource fixtures/good.yaml > /tmp/good-hostpath.txt
-          cat /tmp/good-*.txt
+          for policy in \
+            policies/disallow-privileged.yaml \
+            policies/require-nonroot.yaml \
+            policies/disallow-latest.yaml \
+            policies/require-runtime-controls.yaml \
+            policies/disallow-hostpath.yaml
+          do
+            echo "=== $policy ==="
+            kyverno apply "$policy" --resource fixtures/good.yaml --remove-color
+          done
       - name: Prove unsafe workloads are rejected
         run: |
           check_fail() {
             policy="$1"; resource="$2"; name="$3"
-            kyverno apply "$policy" --resource "$resource" > "/tmp/${name}.txt" || true
+            kyverno apply "$policy" --resource "$resource" --remove-color > "/tmp/${name}.txt" || true
             cat "/tmp/${name}.txt"
             grep -Eiq 'fail[^0-9]*[1-9]' "/tmp/${name}.txt"
           }
@@ -59,8 +63,16 @@ jobs:
           check_fail policies/disallow-latest.yaml fixtures/bad-latest.yaml latest
           check_fail policies/require-runtime-controls.yaml fixtures/bad-resources.yaml runtime
           check_fail policies/disallow-hostpath.yaml fixtures/bad-hostpath.yaml hostpath
-      - name: Validate mutate and generate policy syntax
+      - name: Prove mutation and generation behavior
         run: |
-          kyverno apply policies/add-seccomp.yaml --resource fixtures/bad-root.yaml > /tmp/mutate.txt
-          grep -q 'RuntimeDefault' <(kyverno apply policies/add-seccomp.yaml --resource fixtures/bad-root.yaml --output yaml)
-          kyverno apply policies/generate-default-deny.yaml --resource <(printf '%s\n' 'apiVersion: v1' 'kind: Namespace' 'metadata:' '  name: demo' '  labels:' '    network-policy: default-deny') > /tmp/generate.txt
+          kyverno apply policies/add-seccomp.yaml \
+            --resource fixtures/bad-root.yaml \
+            --remove-color \
+            -o /tmp/mutated.yaml
+          grep -q 'RuntimeDefault' /tmp/mutated.yaml
+          kyverno apply policies/generate-default-deny.yaml \
+            --resource fixtures/network-namespace.yaml \
+            --remove-color \
+            -o /tmp/generated.yaml
+          grep -q 'kind: NetworkPolicy' /tmp/generated.yaml
+          grep -q 'policyTypes' /tmp/generated.yaml

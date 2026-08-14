@@ -29,8 +29,6 @@ spec:
                     readinessProbe:
                       httpGet:
                         path: "?*"
-                        port: "*"
                     livenessProbe:
                       httpGet:
                         path: "?*"
-                        port: "*"
