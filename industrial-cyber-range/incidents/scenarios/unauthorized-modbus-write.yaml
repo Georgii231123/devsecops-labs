@@ -1,0 +1,3 @@
+name: Unauthorized Modbus write from IT zone
+description: A synthetic IT workstation attempts to change PLC pump speed in the local simulator.
+expected_control: The write is rejected and OT-MODBUS-001 plus OT-ZONE-001 are raised.

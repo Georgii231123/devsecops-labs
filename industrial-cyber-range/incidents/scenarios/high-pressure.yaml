@@ -1,0 +1,3 @@
+name: High pressure safe-state drill
+description: A trusted engineering command raises pump speed until the modeled safety threshold is reached.
+expected_control: The safety controller lowers pump speed, opens the relief valve and raises OT-PROCESS-001.

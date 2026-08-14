@@ -1,0 +1,151 @@
+x-python-service: &python-service
+  build: .
+  restart: unless-stopped
+  read_only: true
+  tmpfs:
+    - /tmp
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+
+services:
+  plc:
+    <<: *python-service
+    command: python -m otlab.protocols.modbus_server
+    environment:
+      OTLAB_MODBUS_BIND: 0.0.0.0
+      OTLAB_MODBUS_PORT: 1502
+      OTLAB_ALLOW_MODBUS_WRITES: 0
+    ports:
+      - 127.0.0.1:1502:1502
+    networks:
+      - ot_control
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import socket; s=socket.create_connection(('127.0.0.1',1502),2); s.close()"
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  opcua:
+    <<: *python-service
+    command: python -m otlab.opcua.server
+    environment:
+      OTLAB_MODBUS_HOST: plc
+      OTLAB_MODBUS_PORT: 1502
+      OTLAB_OPCUA_ENDPOINT: opc.tcp://0.0.0.0:4840/otlab/server/
+    ports:
+      - 127.0.0.1:4840:4840
+    depends_on:
+      plc:
+        condition: service_healthy
+    networks:
+      - ot_control
+      - ot_supervisory
+
+  mqtt:
+    image: eclipse-mosquitto:2.1.2
+    command: mosquitto -c /mosquitto-no-auth.conf
+    volumes:
+      - ./mqtt/mosquitto.conf:/mosquitto-no-auth.conf:ro
+    ports:
+      - 127.0.0.1:1883:1883
+    networks:
+      - ot_supervisory
+      - ot_dmz
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+  telemetry:
+    <<: *python-service
+    command: python -m otlab.mqtt.telemetry
+    environment:
+      OTLAB_MODBUS_HOST: plc
+      OTLAB_MODBUS_PORT: 1502
+      OTLAB_MQTT_HOST: mqtt
+      OTLAB_MQTT_PORT: 1883
+    depends_on:
+      plc:
+        condition: service_healthy
+      mqtt:
+        condition: service_started
+    networks:
+      - ot_control
+      - ot_supervisory
+      - ot_dmz
+
+  scada:
+    <<: *python-service
+    command: python -m otlab.scada.app
+    environment:
+      OTLAB_MODBUS_HOST: plc
+      OTLAB_MODBUS_PORT: 1502
+      SCADA_BIND: 0.0.0.0
+      SCADA_PORT: 8080
+    ports:
+      - 127.0.0.1:8088:8080
+    depends_on:
+      plc:
+        condition: service_healthy
+    networks:
+      - ot_control
+      - ot_supervisory
+
+  exporter:
+    <<: *python-service
+    command: python -m otlab.monitoring.exporter
+    environment:
+      OTLAB_MODBUS_HOST: plc
+      OTLAB_MODBUS_PORT: 1502
+      OTLAB_METRICS_PORT: 9102
+    depends_on:
+      plc:
+        condition: service_healthy
+    networks:
+      - ot_control
+      - monitoring
+
+  prometheus:
+    image: prom/prometheus:v3.8.1
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - 127.0.0.1:9090:9090
+    networks:
+      - monitoring
+      - ot_supervisory
+
+  grafana:
+    image: grafana/grafana:13.1.1
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - 127.0.0.1:3000:3000
+    depends_on:
+      - prometheus
+    networks:
+      - monitoring
+
+networks:
+  ot_control:
+    internal: true
+  ot_supervisory:
+    internal: true
+  ot_dmz:
+    internal: true
+  monitoring:
+    internal: true
