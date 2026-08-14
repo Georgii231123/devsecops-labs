@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hostpath-api
+spec:
+  selector:
+    matchLabels: {app: hostpath-api}
+  template:
+    metadata:
+      labels: {app: hostpath-api}
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      volumes:
+        - name: host
+          hostPath:
+            path: /etc
+      containers:
+        - name: api
+          image: nginx:1.29.1
+          securityContext:
+            privileged: false
+          volumeMounts:
+            - name: host
+              mountPath: /host

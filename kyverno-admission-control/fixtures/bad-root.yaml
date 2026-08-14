@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: root-api
+spec:
+  selector:
+    matchLabels: {app: root-api}
+  template:
+    metadata:
+      labels: {app: root-api}
+    spec:
+      securityContext:
+        runAsNonRoot: false
+      containers:
+        - name: api
+          image: nginx:1.29.1
+          securityContext:
+            privileged: false

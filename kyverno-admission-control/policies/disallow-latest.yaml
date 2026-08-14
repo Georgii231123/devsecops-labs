@@ -1,0 +1,22 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-latest
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: immutable-image-tag
+      match:
+        any:
+          - resources:
+              kinds:
+                - Deployment
+      validate:
+        message: The latest image tag is forbidden; use an immutable version or digest.
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - image: "!*:latest"

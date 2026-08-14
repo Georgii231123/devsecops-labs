@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: no-runtime-controls
+spec:
+  selector:
+    matchLabels: {app: no-runtime-controls}
+  template:
+    metadata:
+      labels: {app: no-runtime-controls}
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: api
+          image: nginx:1.29.1
+          securityContext:
+            privileged: false
