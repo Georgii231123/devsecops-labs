@@ -1,3 +1,16 @@
+[build-system]
+requires = ["setuptools>=80,<82"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "industrial-cyber-range"
+version = "0.1.0"
+description = "Local OT/ICS security range and industrial process simulator"
+requires-python = ">=3.13"
+
+[tool.setuptools.packages.find]
+include = ["otlab*"]
+
 [tool.ruff]
 line-length = 100
 target-version = "py313"
