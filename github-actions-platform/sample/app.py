@@ -1,4 +1,5 @@
 import json
+import os
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 
@@ -23,4 +24,5 @@ class Handler(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    ThreadingHTTPServer(("0.0.0.0", 8000), Handler).serve_forever()
+    host = os.getenv("SERVICE_HOST", "127.0.0.1")
+    ThreadingHTTPServer((host, 8000), Handler).serve_forever()
