@@ -39,7 +39,7 @@ jobs:
         run: ruff check .
       - name: Tests
         working-directory: ${{ inputs.working-directory }}
-        run: pytest -q
+        run: python -m pytest -q
       - name: Bandit SAST
         working-directory: ${{ inputs.working-directory }}
         run: bandit -q app.py

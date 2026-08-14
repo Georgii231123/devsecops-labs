@@ -30,7 +30,7 @@ flowchart LR
 ```bash
 python3 -m pip install pyyaml
 python3 scripts/assert_security.py
-docker run --rm -v "$PWD:/work" istio/istioctl:1.30.3 analyze --use-kube=false -f /work/manifests
+docker run --rm -v "$PWD:/work" istio/istioctl:1.30.3 analyze --use-kube=false /work/manifests
 ```
 
 ## What to discuss in an interview

@@ -27,6 +27,6 @@ jobs:
           python3 -m pip install --disable-pip-version-check pyyaml
           python3 scripts/assert_security.py
       - name: Istio static analysis
-        run: docker run --rm -v "$PWD:/work" istio/istioctl:1.30.3 analyze --use-kube=false -f /work/manifests
+        run: docker run --rm -v "$PWD:/work" istio/istioctl:1.30.3 analyze --use-kube=false /work/manifests
       - name: Trivy Kubernetes review
         run: docker run --rm -v "$PWD:/src" aquasec/trivy:latest config --exit-code 0 /src/manifests

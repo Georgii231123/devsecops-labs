@@ -27,7 +27,7 @@ jobs:
           docker compose config >/dev/null
           python3 -m compileall scripts
       - name: Verify Tempo configuration
-        run: docker run --rm -v "$PWD/config/tempo.yaml:/etc/tempo/config.yaml:ro" grafana/tempo:3.0.2 --config.file=/etc/tempo/config.yaml --config.verify
+        run: docker run --rm -v "$PWD/config/tempo.yaml:/etc/tempo/config.yaml:ro" grafana/tempo:3.0.2 --config.file=/etc/tempo/config.yaml --config.verify=true
       - name: Start LGTM stack
         run: docker compose up -d
       - name: End-to-end smoke test
