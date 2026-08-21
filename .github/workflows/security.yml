@@ -30,7 +30,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Validate hardened manifests
         run: |
@@ -60,7 +60,7 @@ jobs:
     needs: policy-as-code
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Trivy Kubernetes config scan
         run: |
