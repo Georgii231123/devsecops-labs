@@ -21,7 +21,7 @@ jobs:
       run:
         working-directory: opentelemetry-tracing
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Static validation
         run: |
           docker compose config >/dev/null
