@@ -21,7 +21,7 @@ jobs:
       run:
         working-directory: kubernetes-production-ops
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Render production overlay
         run: docker run --rm -v "$PWD:/work" -w /work registry.k8s.io/kubectl:v1.31.6 kustomize overlays/prod > /tmp/prod.yaml
       - name: Validate operational controls
