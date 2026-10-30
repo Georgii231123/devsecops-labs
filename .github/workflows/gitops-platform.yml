@@ -21,7 +21,7 @@ jobs:
       run:
         working-directory: gitops-argocd-platform
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Render dev and prod
         run: |
           docker run --rm -v "$PWD:/work" -w /work alpine/helm:3.17.3 lint charts/demo-service -f environments/dev/values.yaml

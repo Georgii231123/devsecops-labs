@@ -21,7 +21,7 @@ jobs:
       run:
         working-directory: observability-sre
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Python syntax
         run: python -m py_compile app/app.py
       - name: Compose validation
